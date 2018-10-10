@@ -34,14 +34,12 @@ test("(study) register ts agrees", async done => {
 
   const serv = app.listen(port, async () => {
     try {
-      const response = await axios.get(`http://localhost:${port}/api/foo`);
+      const response = await axios.get(`http://localhost:${port}/ping/hello`);
       assert.strictEqual(response.status, 200);
-      assert.deepStrictEqual(response.data, { message: "ok" });
+      assert.deepStrictEqual(response.data, { message: "ok hello" });
 
-      const response2 = await axios.get(
-        `http://localhost:${port}/api/bar/12345?q=test`
-      );
-      assert.deepStrictEqual(response2.data, { message: "ok test" });
+      const response2 = await axios.get(`http://localhost:${port}/ping/test`);
+      assert.deepStrictEqual(response2.data, { message: "test" });
 
       serv.close(done);
     } catch (e) {

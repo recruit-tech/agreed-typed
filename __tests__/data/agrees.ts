@@ -1,39 +1,33 @@
-import { Agree } from "../../types";
+import { APIDef, Capture, convert, GET } from "../../types";
 
-const agrees: Agree[] = [
+export type PingAPI = APIDef<
+  ["ping", Capture<":message">],
+  GET,
+  undefined,
+  { message: string }
+>;
+
+const pingAPIs: PingAPI[] = [
   {
     request: {
-      path: "/api/foo",
-      method: "GET"
+      path: ["ping", "test"],
+      method: "GET",
+      body: undefined
     },
     response: {
-      statusCode: 200,
-      body: {
-        message: "ok"
-      }
+      body: { message: "test" }
     }
   },
   {
     request: {
-      path: "/api/bar/:id",
+      path: ["ping", ":message"],
       method: "GET",
-      query: {
-        q: "{:someQuery}"
-      },
-      values: {
-        id: "123",
-        q: "test"
-      }
+      body: undefined
     },
     response: {
-      headers: {
-        token: "{:id}"
-      },
-      body: {
-        message: "ok {:someQuery}"
-      }
+      body: { message: "ok {:message}" }
     }
   }
 ];
 
-module.exports = agrees;
+module.exports = convert(...pingAPIs);
