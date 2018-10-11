@@ -1,10 +1,10 @@
 import { APIDef, Capture, convert, ErrorResponseBody, GET } from "../../types";
 
 export type PingAPI = APIDef<
+  GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
   {}, // request header
   { q: string }, // request query
-  GET, // HTTP Method
   undefined, // request body
   {}, // response header
   200 | 404, // status code

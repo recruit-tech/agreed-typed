@@ -80,10 +80,10 @@ export type ResponseDef<
 };
 
 export type APIDef<
+  M extends HTTPMethods,
   P extends Path,
   ReqHeader extends Headers,
   Q extends Query,
-  M extends HTTPMethods,
   ReqBody extends RequestBody<M>,
   RespHeader extends Headers,
   S extends StatusCode,
