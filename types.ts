@@ -1,10 +1,11 @@
 export type GET = "GET";
+export type HEAD = "HEAD";
 export type POST = "POST";
-export type PATCH = "PATCH";
 export type PUT = "PUT";
+export type PATCH = "PATCH";
 export type DELETE = "DELETE";
 
-export type HTTPMethods = GET | POST | PATCH | PUT | DELETE;
+export type HTTPMethods = GET | HEAD | POST | PATCH | PUT | DELETE;
 
 export type Capture<T extends string> = T | string;
 
