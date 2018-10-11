@@ -2,10 +2,10 @@ import { resolve } from "path";
 import * as ts from "typescript";
 import * as TJS from "typescript-json-schema";
 
-function main() {
+export function run() {
   const fileNames = process.argv.slice(2);
   const agreedAPITypes = parse(fileNames);
-  generateSchema(fileNames, agreedAPITypes);
+  return generateSchema(fileNames, agreedAPITypes);
 }
 
 function generateSchema(fileNames, typeNames) {
@@ -22,8 +22,11 @@ function generateSchema(fileNames, typeNames) {
     __dirname
   );
   const generator = TJS.buildGenerator(program, settings);
-  typeNames.forEach(t => {
-    console.log(JSON.stringify(generator.getSchemaForSymbol(t)));
+  return typeNames.map(t => {
+    return {
+      ...t,
+      schema: generator.getSchemaForSymbol(t.name)
+    };
   });
 }
 
@@ -45,7 +48,23 @@ function parse(fileNames) {
         return;
       }
       const name = node.name.escapedText;
-      exportAPINames.push(name);
+      const nodeType: any = node.type;
+      // console.log(nodeType.typeArguments[1]);
+      const path = nodeType.typeArguments[1].elementTypes.map(t => {
+        if (t.literal) {
+          // string literal
+          return t.literal.text;
+        }
+
+        if (t.typeArguments && t.typeArguments[0]) {
+          // Capture Node
+          return t.typeArguments[0].literal.text;
+        }
+        // tslint:disable-next-line
+        console.error("parser unknown state");
+        process.exit(1);
+      });
+      exportAPINames.push({ name, path });
     });
   });
 
@@ -58,5 +77,3 @@ function isNodeExported(node: any): boolean {
     (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile)
   );
 }
-
-main();
