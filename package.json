@@ -51,6 +51,7 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "agreed-core": "git+https://github.com/recruit-tech/agreed-core#master",
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "ts-simple-ast": "^16.0.4"
   }
 }
