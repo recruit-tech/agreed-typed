@@ -13,7 +13,7 @@ const setupServer = agreed => {
   app.use(cors());
   app.use(
     agreed.middleware({
-      path: path.resolve(__dirname, "./data/agrees.ts")
+      path: path.resolve(__dirname, "./data/agrees-get.ts")
     })
   );
   app.use((err, _, res) => {
