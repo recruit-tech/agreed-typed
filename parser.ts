@@ -2,13 +2,15 @@ import { resolve } from "path";
 import * as ts from "typescript";
 import * as TJS from "typescript-json-schema";
 
-export function run() {
+type Spec = { name: string; path: string[]; schema: object };
+
+export function run(): Spec[] {
   const fileNames = process.argv.slice(2);
   const agreedAPITypes = parse(fileNames);
   return generateSchema(fileNames, agreedAPITypes);
 }
 
-function generateSchema(fileNames, typeNames) {
+function generateSchema(fileNames, typeNames): Spec[] {
   const settings: TJS.PartialArgs = { required: true };
   const compilerOptions: TJS.CompilerOptions = { module: ts.ModuleKind.ES2015 };
 
