@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "lint": "tslint *.ts",
-    "fmt": "tslint --fix"
+    "fmt": "tslint --fix",
+    "gen-swagger": "ts-node generator.ts"
   },
   "devDependencies": {
     "@types/jest": "^23.3.5",
