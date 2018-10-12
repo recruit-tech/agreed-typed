@@ -1,10 +1,10 @@
 import {
   APIDef,
   Capture,
+  ErrorResponseBody,
   GET,
   ResponseBody,
-  StatusCode,
-  ErrorResponseBody
+  StatusCode
 } from "../../types";
 
 type PingBaseAPI<S extends StatusCode, B extends ResponseBody<S>> = APIDef<
@@ -62,3 +62,5 @@ const pingAPIs: PingAPI[] = [
     }
   }
 ];
+
+module.exports = { pingAPIs };

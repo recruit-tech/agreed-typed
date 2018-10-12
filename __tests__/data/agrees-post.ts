@@ -3,8 +3,8 @@ import { APIDef, Capture, convert, ErrorResponseBody, POST } from "../../types";
 export type CreateAPI = APIDef<
   POST, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
-  { apiKey: string },
-  { q: string },
+  { apiKey: string }, // header
+  { q: string }, // query
   CreateRequestBody, // Http Request Body
   {},
   201 | 400,

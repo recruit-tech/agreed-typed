@@ -1,13 +1,4 @@
-import {
-  APIDef,
-  Capture,
-  convert,
-  ErrorResponseBody,
-  GET,
-  POST,
-  ResponseBody,
-  StatusCode
-} from "../../types";
+import { APIDef, Capture, convert, ErrorResponseBody, GET } from "../../types";
 
 export type PingAPI = APIDef<
   GET, // HTTP Method
