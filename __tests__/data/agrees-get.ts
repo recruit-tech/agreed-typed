@@ -3,24 +3,25 @@ import { APIDef, Capture, convert, ErrorResponseBody, GET } from "../../types";
 export type PingAPI = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
-  {}, // request header
-  { q: string }, // request query
+  { apiKey: "x-api-key"; foo?: string }, // request header
+  { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
   {}, // response header
   200 | 404, // status code
   PongBody | ErrorResponseBody // Http Response Body
 >;
 
-class PongBody {
-  public message: string;
-}
+type PongBody = {
+  message: string;
+};
 
 const pingAPIs: PingAPI[] = [
   {
     request: {
       path: ["ping", "test"], // /ping/test
       query: {
-        q: "{:query}"
+        q: "{:query}",
+        moo: "moo"
       },
       method: "GET",
       body: undefined
