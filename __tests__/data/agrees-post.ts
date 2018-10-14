@@ -1,4 +1,10 @@
-import { APIDef, Capture, convert, ErrorResponseBody, POST } from "../../types";
+import {
+  APIDef,
+  Capture,
+  convert,
+  ErrorResponseBody,
+  POST
+} from "../../src/types";
 
 export type CreateAPI = APIDef<
   POST, // HTTP Method

@@ -5,7 +5,7 @@ import {
   GET,
   ResponseBody,
   StatusCode
-} from "../../types";
+} from "../../src/types";
 
 type PingBaseAPI<S extends StatusCode, B extends ResponseBody<S>> = APIDef<
   GET, // HTTP Method
