@@ -4,7 +4,7 @@ import {
   convert,
   ErrorResponseBody,
   POST
-} from "../../src/types";
+} from "../../types";
 
 export type CreateAPI = APIDef<
   POST, // HTTP Method

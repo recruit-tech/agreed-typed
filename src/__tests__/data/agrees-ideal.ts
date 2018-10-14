@@ -1,19 +1,27 @@
-import { APIDef, Capture, convert, ErrorResponseBody, GET } from "../../src/types";
+import {
+  APIDef,
+  Capture,
+  ErrorResponseBody,
+  GET,
+  ResponseBody,
+  StatusCode
+} from "../../types";
 
-export type PingAPI = APIDef<
+type PingBaseAPI<S extends StatusCode, B extends ResponseBody<S>> = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
   { apiKey: "x-api-key"; foo?: string }, // request header
   { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
   {}, // response header
-  200 | 404, // status code
-  PongBody | ErrorResponseBody // Http Response Body
+  S, // status code
+  B // Http Response Body
 >;
 
-type PongBody = {
-  message: string;
-};
+type PingSuccessAPI = PingBaseAPI<200, {}>;
+type PingFailAPI = PingBaseAPI<404, ErrorResponseBody>;
+
+type PingAPI = PingSuccessAPI | PingFailAPI;
 
 const pingAPIs: PingAPI[] = [
   {
@@ -55,4 +63,4 @@ const pingAPIs: PingAPI[] = [
   }
 ];
 
-module.exports = convert(...pingAPIs);
+module.exports = { pingAPIs };

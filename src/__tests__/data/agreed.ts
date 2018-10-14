@@ -1,4 +1,4 @@
-import { APIDef, Capture, GET } from "../../src/types";
+import { APIDef, Capture, GET } from "../../types";
 
 type HelloAPI = APIDef<
   GET, // HTTP Method
