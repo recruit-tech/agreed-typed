@@ -2,8 +2,10 @@ import {
   APIDef,
   Capture,
   convert,
-  ErrorResponseBody,
-  POST
+  Error400,
+  POST,
+  ResponseDef,
+  Success201
 } from "../../types";
 
 export type CreateAPI = APIDef<
@@ -13,8 +15,8 @@ export type CreateAPI = APIDef<
   { q: string }, // query
   CreateRequestBody, // Http Request Body
   {},
-  201 | 400,
-  CreateResponseBody | ErrorResponseBody
+  | ResponseDef<Success201, CreateResponseBody>
+  | ResponseDef<Error400, CreateErrorBody>
 >;
 
 type CreateRequestBody = {
@@ -23,6 +25,11 @@ type CreateRequestBody = {
 };
 
 type CreateResponseBody = {
+  message: string;
+};
+
+type CreateErrorBody = {
+  errorCode: string;
   message: string;
 };
 
@@ -55,7 +62,7 @@ const pingAPIs: CreateAPI[] = [
     },
     response: {
       statusCode: 400,
-      body: { message: "ok {:message}" }
+      body: { errorCode: "not_found", message: "ok {:message}" }
     }
   }
 ];

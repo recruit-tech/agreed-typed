@@ -1,4 +1,12 @@
-import { APIDef, Capture, convert, ErrorResponseBody, GET } from "../../types";
+import {
+  APIDef,
+  Capture,
+  convert,
+  Error404,
+  GET,
+  ResponseDef,
+  Success200
+} from "../../types";
 
 export type PingAPI = APIDef<
   GET, // HTTP Method
@@ -7,11 +15,15 @@ export type PingAPI = APIDef<
   { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
   {}, // response header
-  200 | 404, // status code
-  PongBody | ErrorResponseBody // Http Response Body
->;
+  ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody>
+>; // status code
 
 type PongBody = {
+  message: string;
+};
+
+type ErrorPongBody = {
+  errorCode: string;
   message: string;
 };
 
