@@ -4,13 +4,12 @@ import * as TJS from "typescript-json-schema";
 
 type Spec = { name: string; path: string[]; schema: object };
 
-export function run(): Spec[] {
-  const fileNames = process.argv.slice(2);
-  const agreedAPITypes = parse(fileNames);
-  return generateSchema(fileNames, agreedAPITypes);
+export function extractSchema(fileNames: string[], baseDir?: string): Spec[] {
+  const agreedAPITypes = extractAPINames(fileNames);
+  return generateSchema(fileNames, agreedAPITypes, baseDir);
 }
 
-function generateSchema(fileNames, typeNames): Spec[] {
+export function generateSchema(fileNames, typeNames, baseDir?: string): Spec[] {
   const settings: TJS.PartialArgs = { required: true };
   const compilerOptions: TJS.CompilerOptions = { module: ts.ModuleKind.ES2015 };
 
@@ -21,7 +20,7 @@ function generateSchema(fileNames, typeNames): Spec[] {
   const program = TJS.getProgramFromFiles(
     fileNames.map(res),
     compilerOptions,
-    __dirname
+    baseDir
   );
   const generator = TJS.buildGenerator(program, settings);
   return typeNames.map(t => {
@@ -32,7 +31,7 @@ function generateSchema(fileNames, typeNames): Spec[] {
   });
 }
 
-function parse(fileNames) {
+export function extractAPINames(fileNames) {
   const exportAPINames = [];
   const program = ts.createProgram(fileNames, {
     target: ts.ScriptTarget.ES5,

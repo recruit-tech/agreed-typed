@@ -1,38 +1,4 @@
-import { run } from "./parser";
-
-function main() {
-  const schemas = run();
-
-  const specs = schemas.reduce((prev: any[], current) => {
-    const exist = prev.find(p => {
-      return isSamePath(p.path, current.path);
-    });
-    if (exist) {
-      exist.schemas.push(current);
-      return prev;
-    }
-    prev.push({ path: current.path, schemas: [current] });
-    return prev;
-  }, []);
-
-  const base = {
-    swagger: "2.0",
-    info: {
-      title: "Agreed",
-      description: "Generate from agreed-typed",
-      version: "1.0"
-    },
-    paths: specs.reduce((p, c) => {
-      return {
-        ...p,
-        ...generatePath(c)
-      };
-    }, {})
-  };
-  process.stdout.write(JSON.stringify(base, null, 4));
-}
-
-function generatePath(schema: { path: string[]; schemas: object[] }) {
+export function generatePath(schema: { path: string[]; schemas: object[] }) {
   const pathParam = schema.path.reduce(
     (p, c) => {
       if (c.startsWith(":")) {
@@ -55,9 +21,7 @@ function generatePath(schema: { path: string[]; schemas: object[] }) {
       body
     } = c.schema.properties.request.properties;
     if (p[method.enum[0]]) {
-      // tslint:disable-next-line
-      console.error("generator duplicated specs");
-      process.exit(1);
+      throw new Error("generator duplicated specs");
     }
     let parameters = [
       ...parsePathParam(pathParam.params),
@@ -141,26 +105,3 @@ function parseProperties(query, inname): object[] {
     };
   });
 }
-
-function isSamePath(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  let equal = true;
-  a.forEach((r, i) => {
-    const l = b[i];
-    if (r === l) {
-      return;
-    }
-    if (r.startsWith(":") && l.startsWith(":")) {
-      return;
-    }
-
-    equal = false;
-  });
-
-  return equal;
-}
-
-main();
