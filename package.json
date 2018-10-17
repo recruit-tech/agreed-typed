@@ -53,8 +53,10 @@
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
+    "@types/node": "^10.12.0",
     "agreed-core": "git+https://github.com/recruit-tech/agreed-core#master",
     "axios": "^0.18.0",
+    "minimist": "^1.2.0",
     "typescript-json-schema": "^0.32.0"
   }
 }
