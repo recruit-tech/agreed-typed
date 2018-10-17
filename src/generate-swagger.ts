@@ -1,44 +1,67 @@
-export function generatePath(schema: { path: string[]; schemas: object[] }) {
-  const pathParam = schema.path.reduce(
-    (p, c) => {
-      if (c.startsWith(":")) {
-        const placeholder = c.slice(1);
-        p.name += `/{${placeholder}}`;
-        p.params.push(placeholder);
-        return p;
-      }
-      p.name += "/" + c;
-      return p;
+export function generateSwagger(specs) {
+  const swagger = {
+    swagger: "2.0",
+    info: {
+      title: "Agreed",
+      description: "Generate via agreed-typed",
+      version: "1.0"
     },
-    { name: "", params: [] }
-  );
+    paths: generatePath(specs)
+  };
 
-  const schemas = schema.schemas.reduce((p, c: any) => {
-    const {
-      query,
-      method,
-      headers,
-      body
-    } = c.schema.properties.request.properties;
-    if (p[method.enum[0]]) {
-      throw new Error("generator duplicated specs");
-    }
-    let parameters = [
-      ...parsePathParam(pathParam.params),
-      ...parseProperties(query, "query"),
-      ...parseProperties(headers, "header")
-    ];
+  return swagger;
+}
 
-    if (body && body.properties) {
-      parameters = parameters.concat(parseBody(body));
-    }
-    const responses = parseResponse(c.schema.properties.response);
-    p[method.enum[0].toLowerCase()] = { parameters, responses };
+function generatePath(specs) {
+  const genpath = schema => {
+    const pathParam = schema.path.reduce(
+      (p, c) => {
+        if (c.startsWith(":")) {
+          const placeholder = c.slice(1);
+          p.name += `/{${placeholder}}`;
+          p.params.push(placeholder);
+          return p;
+        }
+        p.name += "/" + c;
+        return p;
+      },
+      { name: "", params: [] }
+    );
 
-    return p;
+    const schemas = schema.schemas.reduce((p, c: any) => {
+      const {
+        query,
+        method,
+        headers,
+        body
+      } = c.schema.properties.request.properties;
+      if (p[method.enum[0]]) {
+        throw new Error("generator duplicated specs");
+      }
+      let parameters = [
+        ...parsePathParam(pathParam.params),
+        ...parseProperties(query, "query"),
+        ...parseProperties(headers, "header")
+      ];
+
+      if (body && body.properties) {
+        parameters = parameters.concat(parseBody(body));
+      }
+      const responses = parseResponse(c.schema.properties.response);
+      p[method.enum[0].toLowerCase()] = { parameters, responses };
+
+      return p;
+    }, {});
+
+    return { [pathParam.name]: schemas };
+  };
+
+  return specs.reduce((p, c) => {
+    return {
+      ...p,
+      ...genpath(c)
+    };
   }, {});
-
-  return { [pathParam.name]: schemas };
 }
 
 function parseBody(body: object): object {

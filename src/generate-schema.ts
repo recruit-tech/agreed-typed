@@ -4,12 +4,8 @@ import * as TJS from "typescript-json-schema";
 
 type Spec = { name: string; path: string[]; schema: object };
 
-export function extractSchema(fileNames: string[], baseDir?: string): Spec[] {
-  const agreedAPITypes = extractAPINames(fileNames);
-  return generateSchema(fileNames, agreedAPITypes, baseDir);
-}
-
-export function generateSchema(fileNames, typeNames, baseDir?: string): Spec[] {
+export function generateSchema(fileNames, baseDir?: string): Spec[] {
+  const typeNames = extractAPINames(fileNames);
   const settings: TJS.PartialArgs = { required: true };
   const compilerOptions: TJS.CompilerOptions = { module: ts.ModuleKind.ES2015 };
 
@@ -50,10 +46,8 @@ export function extractAPINames(fileNames) {
       }
       const name = node.name.escapedText;
       const nodeType: any = node.type;
-      // console.log(nodeType.typeArguments[1]);
       const path = nodeType.typeArguments[1].elementTypes.map(t => {
         if (t.literal) {
-          // string literal
           return t.literal.text;
         }
 
@@ -61,9 +55,7 @@ export function extractAPINames(fileNames) {
           // Capture Node
           return t.typeArguments[0].literal.text;
         }
-        // tslint:disable-next-line
-        console.error("parser unknown state");
-        process.exit(1);
+        throw new Error("parser unknown state");
       });
       exportAPINames.push({ name, path });
     });
