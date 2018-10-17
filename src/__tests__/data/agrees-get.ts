@@ -1,7 +1,6 @@
 import {
   APIDef,
   Capture,
-  convert,
   Error404,
   GET,
   ResponseDef,
@@ -67,4 +66,4 @@ const pingAPIs: PingAPI[] = [
   }
 ];
 
-module.exports = convert(...pingAPIs);
+module.exports = pingAPIs;

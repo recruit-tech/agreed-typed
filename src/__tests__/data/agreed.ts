@@ -1,11 +1,15 @@
 import {
   APIDef,
   Capture,
+  convert,
   Error404,
   GET,
   ResponseDef,
   Success200
 } from "../../types";
+
+import * as getApis from "./agrees-get";
+import * as postApis from "./agrees-post";
 
 type HelloAPI = APIDef<
   GET, // HTTP Method
@@ -55,4 +59,6 @@ const hellos: HelloAPI[] = [
   }
 ];
 
-module.exports = { hellos };
+const agrees = [hellos, getApis, postApis].map((a: any) => convert(...a));
+
+module.exports = agrees.reduce((acc, val) => acc.concat(val), []);

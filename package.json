@@ -57,6 +57,7 @@
     "agreed-core": "git+https://github.com/recruit-tech/agreed-core#master",
     "axios": "^0.18.0",
     "minimist": "^1.2.0",
+    "typescript-estree": "^3.0.0",
     "typescript-json-schema": "^0.32.0"
   }
 }

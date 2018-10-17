@@ -1,7 +1,6 @@
 import {
   APIDef,
   Capture,
-  convert,
   Error400,
   POST,
   ResponseDef,
@@ -33,7 +32,7 @@ type CreateErrorBody = {
   message: string;
 };
 
-const pingAPIs: CreateAPI[] = [
+const createAPIs: CreateAPI[] = [
   {
     request: {
       path: ["ping", "test"], // /ping/test
@@ -67,4 +66,4 @@ const pingAPIs: CreateAPI[] = [
   }
 ];
 
-module.exports = convert(...pingAPIs);
+module.exports = createAPIs;

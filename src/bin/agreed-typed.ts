@@ -2,6 +2,7 @@
 
 import * as minimist from "minimist";
 import { generate } from "../commands/swagger";
+import "../hook";
 import { showHelp } from "../util";
 
 const help = `
