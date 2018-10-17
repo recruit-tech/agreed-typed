@@ -1,54 +1,47 @@
 #!/usr/bin/env node
 
-import { generateSchema } from "../generate-schema";
-import { generateSwagger } from "../generate-swagger";
+import * as minimist from "minimist";
+import { generate } from "../commands/swagger";
+import { showHelp } from "../util";
+
+const help = `
+Usage: agreed-typed [subcommand] [options]
+Subcommands:
+  gen-swagger                        Generate swagger file.
+Options:
+  --help                             Shows the usage and exits.
+  --version                          Shows version number and exits.
+Examples:
+  agreed-typed gen-swagger --path ./agreed.ts
+`.trim();
 
 function main() {
+  const argv = minimist(process.argv.slice(2), {
+    stopEarly: true,
+    string: ["help", "version"]
+  });
   const commands = {
-    sw
+    ["gen-swagger"]: generate
   };
-}
 
-function sw() {
-  const filenames = process.argv.slice(2);
-  const schemas = generateSchema(filenames, __dirname);
-
-  const specs = schemas.reduce((prev: any[], current) => {
-    const exist = prev.find(p => {
-      return isSamePath(p.path, current.path);
-    });
-    if (exist) {
-      exist.schemas.push(current);
-      return prev;
-    }
-    prev.push({ path: current.path, schemas: [current] });
-    return prev;
-  }, []);
-
-  const swagger = generateSwagger(specs);
-
-  process.stdout.write(JSON.stringify(swagger, null, 4));
-}
-
-function isSamePath(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) {
-    return false;
+  if (argv.help) {
+    return showHelp(0, help);
   }
 
-  let equal = true;
-  a.forEach((r, i) => {
-    const l = b[i];
-    if (r === l) {
-      return;
-    }
-    if (r.startsWith(":") && l.startsWith(":")) {
-      return;
-    }
+  if (argv.version) {
+    const pack = require("../../package.json");
+    process.stdout.write(pack.version);
+    return;
+  }
+  const subcommand = argv._.shift();
 
-    equal = false;
-  });
+  const fun = commands[subcommand];
 
-  return equal;
+  if (!fun) {
+    return showHelp(1, help);
+  }
+
+  fun(argv._);
 }
 
 main();
