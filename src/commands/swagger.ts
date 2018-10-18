@@ -2,7 +2,7 @@ import * as minimist from "minimist";
 import * as path from "path";
 import { generateSchema } from "../generate-schema";
 import { generateSwagger } from "../generate-swagger";
-import { showHelp } from "../util";
+import { flatten, showHelp } from "../util";
 
 import * as fs from "fs";
 import { parse } from "typescript-estree";
@@ -27,6 +27,7 @@ export function generate(arg) {
 
   const agreedPath = path.resolve(process.cwd(), argv.path);
   require(agreedPath);
+
   const currentModule = require.main.children.find(
     m => m.filename === __filename
   );
@@ -35,40 +36,8 @@ export function generate(arg) {
     m => m.filename === agreedPath
   );
 
-  const agrees = agreedRoot.children
-    .filter(m => {
-      return m.filename.endsWith(".ts") && !m.filename.includes("node_modules");
-    })
-    .filter(m => {
-      const file = fs.readFileSync(m.filename, "utf-8");
-      const ast = parse(file);
-
-      const asts = (ast.body as any[]).reduce((p, c) => {
-        if (
-          c.type !== "ExportNamedDeclaration" ||
-          c.declaration.kind !== "type"
-        ) {
-          return p;
-        }
-
-        const declarations = c.declaration.declarations;
-        if (!declarations || !declarations[0]) {
-          return p;
-        }
-        if (
-          declarations[0].init &&
-          declarations[0].init.type === "TSTypeReference" &&
-          declarations[0].init.typeName.name === "APIDef"
-        ) {
-          p.push(c);
-        }
-
-        return p;
-      }, []);
-      return asts.length > 0;
-    });
-
-  console.log(agrees);
+  const asts = traverse(agreedRoot, 2);
+  console.log(asts);
   throw new Error("break");
 
   const filenames = process.argv.slice(2);
@@ -89,6 +58,60 @@ export function generate(arg) {
   const swagger = generateSwagger(specs);
 
   process.stdout.write(JSON.stringify(swagger, null, 4));
+}
+
+function traverse(mod, lim = 2) {
+  const files = [];
+  function traverseRec(module, asts, depth, limit) {
+    if (depth >= limit || files.includes(module.filename)) {
+      return asts;
+    }
+    files.push(module.filename);
+    if (
+      module.filename.endsWith(".ts") &&
+      !module.filename.includes("node_modules")
+    ) {
+      const file = fs.readFileSync(module.filename, "utf-8");
+      const ast = parse(file);
+
+      const mods = (ast.body as any[])
+        .reduce((prev, current) => {
+          if (
+            current.type !== "ExportNamedDeclaration" ||
+            current.declaration.kind !== "type"
+          ) {
+            return prev;
+          }
+
+          const declarations = current.declaration.declarations;
+          if (!declarations || !declarations[0]) {
+            return prev;
+          }
+          if (
+            declarations[0].init &&
+            declarations[0].init.type === "TSTypeReference" &&
+            declarations[0].init.typeName.name === "APIDef"
+          ) {
+            prev.push({ name: declarations[0].id.name, ast: current });
+          }
+
+          return prev;
+        }, [])
+        .map(m => {
+          return { filename: module.filename, asts: m };
+        });
+      asts = asts.concat(...mods);
+    }
+
+    const c = module.children
+      .map(m => {
+        return traverseRec(m, asts, depth + 1, limit);
+      })
+      .filter(a => a.length > 0);
+    return asts.concat(...flatten(c));
+  }
+
+  return traverseRec(mod, [], 0, lim);
 }
 
 function isSamePath(a: string[], b: string[]): boolean {
