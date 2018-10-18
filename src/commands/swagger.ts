@@ -36,12 +36,19 @@ export function generate(arg) {
     m => m.filename === agreedPath
   );
 
-  const asts = traverse(agreedRoot, 2);
-  console.log(asts);
-  throw new Error("break");
+  const mods = traverse(agreedRoot, 2);
 
-  const filenames = process.argv.slice(2);
-  const schemas = generateSchema(filenames, __dirname);
+  const filenames = mods.map(a => {
+    return a.filename;
+  });
+
+  const typeNames = flatten(
+    mods.map(a => {
+      return a.asts.map(m => m.name);
+    })
+  );
+
+  const schemas = generateSchema(filenames, typeNames, __dirname);
 
   const specs = schemas.reduce((prev: any[], current) => {
     const exist = prev.find(p => {
@@ -74,33 +81,32 @@ function traverse(mod, lim = 2) {
       const file = fs.readFileSync(module.filename, "utf-8");
       const ast = parse(file);
 
-      const mods = (ast.body as any[])
-        .reduce((prev, current) => {
-          if (
-            current.type !== "ExportNamedDeclaration" ||
-            current.declaration.kind !== "type"
-          ) {
-            return prev;
-          }
-
-          const declarations = current.declaration.declarations;
-          if (!declarations || !declarations[0]) {
-            return prev;
-          }
-          if (
-            declarations[0].init &&
-            declarations[0].init.type === "TSTypeReference" &&
-            declarations[0].init.typeName.name === "APIDef"
-          ) {
-            prev.push({ name: declarations[0].id.name, ast: current });
-          }
-
+      const mods = (ast.body as any[]).reduce((prev, current) => {
+        if (
+          current.type !== "ExportNamedDeclaration" ||
+          current.declaration.kind !== "type"
+        ) {
           return prev;
-        }, [])
-        .map(m => {
-          return { filename: module.filename, asts: m };
-        });
-      asts = asts.concat(...mods);
+        }
+
+        const declarations = current.declaration.declarations;
+        if (!declarations || !declarations[0]) {
+          return prev;
+        }
+        if (
+          declarations[0].init &&
+          declarations[0].init.type === "TSTypeReference" &&
+          declarations[0].init.typeName.name === "APIDef"
+        ) {
+          prev.push({ name: declarations[0].id.name, ast: current });
+        }
+
+        return prev;
+      }, []);
+
+      if (mods.length > 0) {
+        asts.push({ filename: module.filename, asts: mods });
+      }
     }
 
     const c = module.children
