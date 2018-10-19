@@ -1,11 +1,4 @@
-import {
-  APIDef,
-  Capture,
-  Error400,
-  POST,
-  ResponseDef,
-  Success201
-} from "../../types";
+import { APIDef, Capture, POST, ResponseDef, Success201 } from "../../types";
 
 export type CreateAPI = APIDef<
   POST, // HTTP Method
@@ -14,8 +7,7 @@ export type CreateAPI = APIDef<
   { q: string }, // query
   CreateRequestBody, // Http Request Body
   {},
-  | ResponseDef<Success201, CreateResponseBody>
-  | ResponseDef<Error400, CreateErrorBody>
+  ResponseDef<Success201, CreateResponseBody>
 >;
 
 type CreateRequestBody = {
@@ -24,11 +16,6 @@ type CreateRequestBody = {
 };
 
 type CreateResponseBody = {
-  message: string;
-};
-
-type CreateErrorBody = {
-  errorCode: string;
   message: string;
 };
 
@@ -48,20 +35,6 @@ const createAPIs: CreateAPI[] = [
     response: {
       statusCode: 201,
       body: { message: "test" }
-    }
-  },
-  {
-    request: {
-      path: ["ping", ":message"], // /ping/:message
-      method: "POST",
-      body: {
-        email: "error@error.com",
-        id: 999
-      }
-    },
-    response: {
-      statusCode: 400,
-      body: { errorCode: "not_found", message: "ok {:message}" }
     }
   }
 ];

@@ -47,6 +47,7 @@ function generatePath(specs) {
       if (body && body.properties) {
         parameters = parameters.concat(parseBody(body));
       }
+
       const responses = parseResponse(c.schema.properties.response);
       p[method.enum[0].toLowerCase()] = { parameters, responses };
 
@@ -74,9 +75,9 @@ function parseBody(body: object): object {
 }
 
 function parseResponse(resp: any): object {
-  const body = !resp.properties.body.anyOf
-    ? { success: resp.properties.body }
-    : resp.properties.body.anyOf.reduce((p, c) => {
+  const body = !resp.anyOf
+    ? { success: resp.properties }
+    : resp.anyOf.reduce((p, c) => {
         if (Object.keys(c.properties).includes("errorCode")) {
           p.error = c;
           return p;
