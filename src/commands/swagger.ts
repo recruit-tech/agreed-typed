@@ -2,7 +2,7 @@ import * as minimist from "minimist";
 import * as path from "path";
 import { generateSchema } from "../generate-schema";
 import { generateSwagger } from "../generate-swagger";
-import { flatten, showHelp } from "../util";
+import { showHelp } from "../util";
 
 import * as fs from "fs";
 import { parse } from "typescript-estree";
@@ -42,13 +42,12 @@ export function generate(arg) {
     return a.filename;
   });
 
-  const typeNames = flatten(
-    mods.map(a => {
-      return a.asts.map(m => m.name);
-    })
-  );
+  const typeNames = mods.reduce((p, a) => {
+    p = p.concat(...a.asts.map(m => m.meta));
+    return p;
+  }, []);
 
-  const schemas = generateSchema(filenames, typeNames, __dirname);
+  const schemas = generateSchema(filenames, typeNames, "/");
 
   const specs = schemas.reduce((prev: any[], current) => {
     const exist = prev.find(p => {
@@ -98,7 +97,19 @@ function traverse(mod, lim = 2) {
           declarations[0].init.type === "TSTypeReference" &&
           declarations[0].init.typeName.name === "APIDef"
         ) {
-          prev.push({ name: declarations[0].id.name, ast: current });
+          const pathType =
+            declarations[0].init.typeParameters.params[1].typeName.elementTypes;
+
+          const pathArr = pathType.map(p => {
+            if (p.literal) {
+              return p.literal.value; // string
+            }
+            return p.typeParameters.params[0].typeName.literal.value;
+          });
+          prev.push({
+            meta: { name: declarations[0].id.name, path: pathArr },
+            ast: current
+          });
         }
 
         return prev;
@@ -109,12 +120,11 @@ function traverse(mod, lim = 2) {
       }
     }
 
-    const c = module.children
-      .map(m => {
-        return traverseRec(m, asts, depth + 1, limit);
-      })
-      .filter(a => a.length > 0);
-    return asts.concat(...flatten(c));
+    module.children.forEach(m => {
+      traverseRec(m, asts, depth + 1, limit);
+    });
+
+    return asts;
   }
 
   return traverseRec(mod, [], 0, lim);
