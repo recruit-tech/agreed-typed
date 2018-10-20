@@ -47,7 +47,6 @@ function generatePath(specs) {
       if (body && body.properties) {
         parameters = parameters.concat(parseBody(body));
       }
-
       const responses = parseResponse(c.schema.properties.response);
       p[method.enum[0].toLowerCase()] = { parameters, responses };
 
@@ -75,25 +74,30 @@ function parseBody(body: object): object {
 }
 
 function parseResponse(resp: any): object {
-  const body = !resp.anyOf
-    ? { success: resp.properties }
-    : resp.anyOf.reduce((p, c) => {
-        if (Object.keys(c.properties).includes("errorCode")) {
-          p.error = c;
-          return p;
+  const responses = resp.anyOf ? resp.anyOf.map(a => a.allOf) : [resp.allOf];
+  return responses.reduce((p, c) => {
+    const headers = c.find(r => r.properties.headers);
+    const statusCode = c.find(r => r.properties.statusCode);
+    const body = c.find(r => r.properties.body);
+
+    const headerProps = headers ? headers.properties.headers.properties : {};
+    const h = Object.keys(headerProps).reduce((m, current) => {
+      return {
+        ...m,
+        [current]: {
+          description: current,
+          type: headerProps[current].type
         }
-        p.success = c;
-        return p;
-      }, {});
-  return resp.properties.statusCode.enum.reduce((p, c) => {
-    if (c >= 400 && !body.error) {
-      return p;
-    }
-    p[`${c}`] = {
-      description: "test",
-      schema: c >= 400 ? body.error : body.success
+      };
+    }, {});
+    return {
+      ...p,
+      [`${statusCode.properties.statusCode.enum[0]}`]: {
+        description: "test",
+        headers: h, // headers ? parseProperties(headers, "header") : {},
+        schema: body.properties.body
+      }
     };
-    return p;
   }, {});
 }
 

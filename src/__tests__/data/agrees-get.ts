@@ -13,7 +13,7 @@ export type PingAPI = APIDef<
   { apiKey: "x-api-key"; foo?: string }, // request header
   { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
-  {}, // response header
+  { "x-token": "xxx" }, // response header
   ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody>
 >; // status code
 
@@ -38,6 +38,7 @@ const pingAPIs: PingAPI[] = [
       body: undefined
     },
     response: {
+      headers: { "x-token": "xxx" },
       statusCode: 200,
       body: { message: "test" }
     }
@@ -49,6 +50,7 @@ const pingAPIs: PingAPI[] = [
       body: undefined
     },
     response: {
+      headers: { "x-token": "xxx" },
       statusCode: 200,
       body: { message: "ok {:message}" }
     }

@@ -49,9 +49,6 @@ export function generate(arg) {
 
   const schemas = generateSchema(filenames, typeNames, "/");
 
-  process.stdout.write(JSON.stringify(schemas, null, 4));
-  process.exit(1);
-
   const specs = schemas.reduce((prev: any[], current) => {
     const exist = prev.find(p => {
       return isSamePath(p.path, current.path);
