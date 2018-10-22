@@ -7,6 +7,7 @@ import { showHelp } from "../util";
 import { BaseExpression, Identifier, Program } from "estree";
 import * as fs from "fs";
 import { parse } from "typescript-estree";
+import { Definition } from "typescript-json-schema";
 
 const usage = `
 Usage: agreed-typed gen-swagger [options]
@@ -50,7 +51,7 @@ export function generate(arg) {
 
   const schemas = generateSchema(filenames, typeNames, "/");
 
-  const specs = schemas.reduce((prev: any[], current) => {
+  const specs = schemas.reduce((prev: ReducedSpec[], current) => {
     const exist = prev.find(p => {
       return isSamePath(p.path, current.path);
     });
@@ -65,6 +66,15 @@ export function generate(arg) {
   const swagger = generateSwagger(specs);
 
   process.stdout.write(JSON.stringify(swagger, null, 4));
+}
+
+export interface ReducedSpec {
+  path: string[];
+  schemas: Array<{
+    name: string;
+    path: string[];
+    schema: Definition;
+  }>;
 }
 
 function traverse(mod: NodeModule, lim = 2) {
