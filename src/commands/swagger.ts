@@ -4,8 +4,10 @@ import { generateSchema } from "../generate-schema";
 import { generateSwagger } from "../generate-swagger";
 import { showHelp } from "../util";
 
+import { BaseExpression, Identifier, Program } from "estree";
 import * as fs from "fs";
 import { parse } from "typescript-estree";
+import { Definition } from "typescript-json-schema";
 
 const usage = `
 Usage: agreed-typed gen-swagger [options]
@@ -49,7 +51,7 @@ export function generate(arg) {
 
   const schemas = generateSchema(filenames, typeNames, "/");
 
-  const specs = schemas.reduce((prev: any[], current) => {
+  const specs = schemas.reduce((prev: ReducedSpec[], current) => {
     const exist = prev.find(p => {
       return isSamePath(p.path, current.path);
     });
@@ -66,9 +68,18 @@ export function generate(arg) {
   process.stdout.write(JSON.stringify(swagger, null, 4));
 }
 
-function traverse(mod, lim = 2) {
+export interface ReducedSpec {
+  path: string[];
+  schemas: Array<{
+    name: string;
+    path: string[];
+    schema: Definition;
+  }>;
+}
+
+function traverse(mod: NodeModule, lim = 2) {
   const files = [];
-  function traverseRec(module, asts, depth, limit) {
+  function traverseRec(module: NodeModule, asts, depth, limit) {
     if (depth >= limit || files.includes(module.filename)) {
       return asts;
     }
@@ -78,13 +89,13 @@ function traverse(mod, lim = 2) {
       !module.filename.includes("node_modules")
     ) {
       const file = fs.readFileSync(module.filename, "utf-8");
-      const ast = parse(file);
+      const ast: Program = parse(file);
 
-      const mods = (ast.body as any[]).reduce((prev, current) => {
-        if (
-          current.type !== "ExportNamedDeclaration" ||
-          current.declaration.kind !== "type"
-        ) {
+      const mods = ast.body.reduce((prev, current) => {
+        if (current.type !== "ExportNamedDeclaration") {
+          return prev;
+        }
+        if (current.declaration.type !== "VariableDeclaration") {
           return prev;
         }
 
@@ -92,13 +103,14 @@ function traverse(mod, lim = 2) {
         if (!declarations || !declarations[0]) {
           return prev;
         }
+
         if (
           declarations[0].init &&
-          declarations[0].init.type === "TSTypeReference" &&
-          declarations[0].init.typeName.name === "APIDef"
+          (declarations[0].init.type as string) === "TSTypeReference" &&
+          (declarations[0].init as any).typeName.name === "APIDef"
         ) {
-          const pathType =
-            declarations[0].init.typeParameters.params[1].typeName.elementTypes;
+          const init: TSTypeReference = declarations[0].init as any;
+          const pathType = init.typeParameters.params[1].typeName.elementTypes;
 
           const pathArr = pathType.map(p => {
             if (p.literal) {
@@ -107,7 +119,7 @@ function traverse(mod, lim = 2) {
             return p.typeParameters.params[0].typeName.literal.value;
           });
           prev.push({
-            meta: { name: declarations[0].id.name, path: pathArr },
+            meta: { name: (declarations[0].id as any).name, path: pathArr },
             ast: current
           });
         }
@@ -128,6 +140,19 @@ function traverse(mod, lim = 2) {
   }
 
   return traverseRec(mod, [], 0, lim);
+}
+
+// work around
+interface TSTypeReference extends BaseExpression {
+  type: "TSTypeReference";
+  transformFlags?: boolean;
+  typeName: Identifier;
+  typeParameters: TSTypeParameterInstantiation;
+}
+
+interface TSTypeParameterInstantiation extends BaseExpression {
+  type: "TSTypeParameterInstantiation";
+  params: any[];
 }
 
 function isSamePath(a: string[], b: string[]): boolean {

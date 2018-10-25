@@ -1,4 +1,6 @@
-export function generateSwagger(specs) {
+import { ReducedSpec } from "./commands/swagger";
+
+export function generateSwagger(specs: ReducedSpec[]) {
   const swagger = {
     swagger: "2.0",
     info: {
@@ -12,8 +14,8 @@ export function generateSwagger(specs) {
   return swagger;
 }
 
-function generatePath(specs) {
-  const genpath = schema => {
+function generatePath(specs: ReducedSpec[]) {
+  const genpath = (schema: ReducedSpec) => {
     const pathParam = schema.path.reduce(
       (p, c) => {
         if (c.startsWith(":")) {

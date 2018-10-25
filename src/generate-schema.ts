@@ -1,8 +1,12 @@
 import { resolve } from "path";
 import * as ts from "typescript";
-import * as TJS from "typescript-json-schema";
+import { default as TJS, Definition } from "typescript-json-schema";
 
-type Spec = { name: string; path: string[]; schema: object };
+export interface Spec {
+  name: string;
+  path: string[];
+  schema: Definition;
+}
 
 export function generateSchema(fileNames, typeNames, baseDir?: string): Spec[] {
   const settings: TJS.PartialArgs = { required: true };
