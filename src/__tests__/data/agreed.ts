@@ -1,4 +1,15 @@
-import { APIDef, Capture, GET } from "../../types";
+import {
+  APIDef,
+  Capture,
+  convert,
+  Error404,
+  GET,
+  ResponseDef,
+  Success200
+} from "../../types";
+
+import * as getApis from "./agrees-get";
+import * as postApis from "./agrees-post";
 
 type HelloAPI = APIDef<
   GET, // HTTP Method
@@ -7,8 +18,8 @@ type HelloAPI = APIDef<
   { q: string }, // request query
   undefined, // request body
   {}, // response header
-  200, // response status code
-  HelloResponseBody // response body
+  | ResponseDef<Success200, HelloResponseBody>
+  | ResponseDef<Error404, { error: "test" }> // response body and status
 >;
 
 type HelloResponseBody = { message: string };
@@ -32,7 +43,7 @@ const hellos: HelloAPI[] = [
   },
   {
     request: {
-      path: ["users", ":id"],
+      path: ["user", "9999"],
       method: "GET",
       query: {
         q: "{:someQueryStrings}"
@@ -40,13 +51,14 @@ const hellos: HelloAPI[] = [
       body: undefined
     },
     response: {
-      statusCode: 201,
+      statusCode: 404,
       body: {
-        message: "{:id} {:someQueryString}",
-        unknown: "test"
+        error: "test"
       }
     }
   }
 ];
 
-module.exports = { hellos };
+const agrees = [hellos, getApis, postApis].map((a: any) => convert(...a));
+
+module.exports = agrees.reduce((acc, val) => acc.concat(val), []);

@@ -38,7 +38,9 @@ test("(study) register ts agrees", async done => {
       assert.strictEqual(response.status, 200);
       assert.deepStrictEqual(response.data, { message: "ok hello" });
 
-      const response2 = await axios.get(`http://localhost:${port}/ping/test`);
+      const response2 = await axios.get(
+        `http://localhost:${port}/ping/test?moo=moo&q=q`
+      );
       assert.deepStrictEqual(response2.data, { message: "test" });
 
       serv.close(done);

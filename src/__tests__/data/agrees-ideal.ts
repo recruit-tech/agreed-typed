@@ -1,27 +1,21 @@
 import {
   APIDef,
   Capture,
-  ErrorResponseBody,
+  Error404,
   GET,
-  ResponseBody,
-  StatusCode
+  ResponseDef,
+  Success200
 } from "../../types";
 
-type PingBaseAPI<S extends StatusCode, B extends ResponseBody<S>> = APIDef<
+type PingAPI = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
   { apiKey: "x-api-key"; foo?: string }, // request header
   { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
   {}, // response header
-  S, // status code
-  B // Http Response Body
+  ResponseDef<Success200, {}> | ResponseDef<Error404, {}>
 >;
-
-type PingSuccessAPI = PingBaseAPI<200, {}>;
-type PingFailAPI = PingBaseAPI<404, ErrorResponseBody>;
-
-type PingAPI = PingSuccessAPI | PingFailAPI;
 
 const pingAPIs: PingAPI[] = [
   {

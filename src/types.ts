@@ -37,47 +37,81 @@ export type RequestDef<
   body: B;
 };
 
-export type StatusCode = number;
+export type Status<C extends number, T extends string> = {
+  statusCode: C;
+  statusText?: T;
+};
 
-export type Error40x =
-  | 400
-  | 401
-  | 402
-  | 403
-  | 404
-  | 405
-  | 406
-  | 407
-  | 408
-  | 409
-  | 410
-  | 411
-  | 412
-  | 413
-  | 414
-  | 415
-  | 416
-  | 417
-  | 418;
+export type Success200 = Status<200, "OK">;
+export type Success201 = Status<201, "Created">;
+export type Success202 = Status<202, "Accepted">;
+export type Success203 = Status<203, "Non-Authoritative Information">;
+export type Success204 = Status<204, "No Content">;
+export type Success205 = Status<205, "Reset Content">;
+export type Success206 = Status<206, "Parial Content">;
+export type Success207 = Status<207, "Multi-Status">;
+export type Success208 = Status<208, "Already Reported">;
+export type Success226 = Status<226, "IM Used">;
 
-export type Error50x = 500 | 501 | 502 | 503;
+export type Redirection300 = Status<300, "Multiple Choices">;
+export type Redirection301 = Status<301, "Moved Permanently">;
+export type Redirection302 = Status<302, "Found">;
+export type Redirection303 = Status<303, "See Other">;
+export type Redirection304 = Status<304, "Not Modified">;
+export type Redirection305 = Status<305, "Use Proxy">;
+export type Redirection307 = Status<307, "Temporary Redirect">;
+export type Redirection308 = Status<308, "Permanent Redirect">;
 
-export type ErrorResponseBody = { errorCode: string; message: string };
+// 40x client error
+export type Error400 = Status<400, "Bad Request">;
+export type Error401 = Status<401, "Unauthorized">;
+export type Error402 = Status<402, "Payment Required">;
+export type Error403 = Status<403, "Forbidden">;
+export type Error404 = Status<404, "Not Found">;
+export type Error405 = Status<405, "Method Not Allowed">;
+export type Error406 = Status<406, "Not Acceptable">;
+export type Error407 = Status<407, "Proxy Authentication Required">;
+export type Error408 = Status<408, "Request Timeout">;
+export type Error409 = Status<409, "Conflict">;
+export type Error410 = Status<410, "Goe">;
+export type Error411 = Status<411, "Length Required">;
+export type Error412 = Status<412, "Precondition Failed">;
+export type Error413 = Status<413, "Payload Too Large">;
+export type Error414 = Status<414, "URI Too Long">;
+export type Error415 = Status<415, "Unsupported Media Type">;
+export type Error416 = Status<416, "Range Not Satisfiable">;
+export type Error417 = Status<417, "Expectation Failed">;
+export type Error418 = Status<418, "I'm teapot">;
+export type Error421 = Status<421, "Misdirected Request">;
+export type Error422 = Status<422, "Unprocessable Entity">;
+export type Error423 = Status<423, "Locked">;
+export type Error424 = Status<424, "Failed Dependency">;
+export type Error425 = Status<425, "Too Early">;
+export type Error426 = Status<426, "Upgrade Required">;
+export type Error451 = Status<451, "Unavailable For Legal Reasons">;
 
-export type ResponseBody<S extends StatusCode> = S extends Error40x | Error50x
-  ? ErrorResponseBody
-  : object;
+// 50x server error
+export type Error500 = Status<500, "Internal Server Error">;
+export type Error501 = Status<501, "Not Implemented">;
+export type Error502 = Status<502, "Bad Gateway">;
+export type Error503 = Status<503, "Service Unavailable">;
+export type Error504 = Status<504, "Gateway Timeout">;
+export type Error505 = Status<505, "HTTP version Not Supported">;
+export type Error506 = Status<506, "Variant Also Negotiates">;
+export type Error507 = Status<507, "Insufficient Storage">;
+export type Error508 = Status<508, "Loop Detected">;
+export type Error509 = Status<509, "Bandwidth Limit Exceeded">;
+export type Error510 = Status<510, "Not Extended">;
+export type Error511 = Status<511, "Network Authentication Required">;
+
+export type ResponseBody = object;
 
 export type ResponseDef<
-  H extends Headers,
-  S extends StatusCode,
-  B extends ResponseBody<S>
+  S extends Status<number, string>,
+  B extends ResponseBody
 > = {
-  headers?: H;
-  values?: object;
-  statusCode: S;
   body?: B;
-};
+} & S;
 
 export type APIDef<
   M extends HTTPMethods,
@@ -86,11 +120,13 @@ export type APIDef<
   Q extends Query,
   ReqBody extends RequestBody<M>,
   RespHeader extends Headers,
-  S extends StatusCode,
-  RespBody extends ResponseBody<S>
+  Resp extends ResponseDef<Status<number, string>, object>
 > = {
   request: RequestDef<P, ReqHeader, Q, M, ReqBody>;
-  response: ResponseDef<RespHeader, S, RespBody>;
+  response: {
+    headers?: RespHeader;
+    values?: object;
+  } & Resp;
 };
 
 export function convert(...apis: Array<{ request }>) {
