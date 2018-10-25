@@ -1,12 +1,17 @@
-import { ReducedSpec } from "./commands/swagger";
+import { ReducedSpec } from "./commands/gen-swagger";
 
-export function generateSwagger(specs: ReducedSpec[]) {
+export function generateSwagger(
+  specs: ReducedSpec[],
+  title = "Agreed",
+  description = "Generate via agreed-typed",
+  version = "0.0.1"
+) {
   const swagger = {
     swagger: "2.0",
     info: {
-      title: "Agreed",
-      description: "Generate via agreed-typed",
-      version: "1.0"
+      title,
+      description,
+      version
     },
     paths: generatePath(specs)
   };

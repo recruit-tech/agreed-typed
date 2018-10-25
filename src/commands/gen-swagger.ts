@@ -4,15 +4,19 @@ import { generateSchema } from "../generate-schema";
 import { generateSwagger } from "../generate-swagger";
 import { showHelp } from "../util";
 
-import { BaseExpression, Identifier, Program } from "estree";
+import { Program } from "estree";
 import * as fs from "fs";
 import { parse } from "typescript-estree";
 import { Definition } from "typescript-json-schema";
+import { TSTypeReference } from "../expression-types";
 
 const usage = `
 Usage: agreed-typed gen-swagger [options]
 Options:
   --path                             Agreed file path (required)
+  --title                            swagger title
+  --description                      swagger description
+  --version                          document version
 Examples:
   agreed-typed gen-swagger --path ./agreed.ts
 `.trim();
@@ -38,7 +42,7 @@ export function generate(arg) {
     m => m.filename === agreedPath
   );
 
-  const mods = traverse(agreedRoot, 2);
+  const mods = aggregateModules(agreedRoot, 2);
 
   const filenames = mods.map(a => {
     return a.filename;
@@ -77,9 +81,9 @@ export interface ReducedSpec {
   }>;
 }
 
-function traverse(mod: NodeModule, lim = 2) {
+function aggregateModules(mod: NodeModule, lim = 2) {
   const files = [];
-  function traverseRec(module: NodeModule, asts, depth, limit) {
+  const rec = (module: NodeModule, asts, depth, limit) => {
     if (depth >= limit || files.includes(module.filename)) {
       return asts;
     }
@@ -133,26 +137,13 @@ function traverse(mod: NodeModule, lim = 2) {
     }
 
     module.children.forEach(m => {
-      traverseRec(m, asts, depth + 1, limit);
+      rec(m, asts, depth + 1, limit);
     });
 
     return asts;
-  }
+  };
 
-  return traverseRec(mod, [], 0, lim);
-}
-
-// work around
-interface TSTypeReference extends BaseExpression {
-  type: "TSTypeReference";
-  transformFlags?: boolean;
-  typeName: Identifier;
-  typeParameters: TSTypeParameterInstantiation;
-}
-
-interface TSTypeParameterInstantiation extends BaseExpression {
-  type: "TSTypeParameterInstantiation";
-  params: any[];
+  return rec(mod, [], 0, lim);
 }
 
 function isSamePath(a: string[], b: string[]): boolean {

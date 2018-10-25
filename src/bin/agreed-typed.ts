@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as minimist from "minimist";
-import { generate } from "../commands/swagger";
+import { generate } from "../commands/gen-swagger";
 import "../hook";
 import { showHelp } from "../util";
 
