@@ -3,20 +3,33 @@
 - agreed api type definitions (types.ts)
 - agreed.ts to swagger generator
 
-## generate swagger
+## install
 ```shell
-$ yarn gen-swagger [...agreed (ts) file paths]
+$ npm install -g agreed-typed
 ```
 
-### example
+## usage
 ```shell
-$ yarn gen-swagger __tests__/data/agrees-get.ts __tests__/data/agrees-post.ts
+$ agreed-typed --help
+Usage: agreed-typed [subcommand] [options]
+Subcommands:
+  gen-swagger                        Generate swagger file.
+Options:
+  --help                             Shows the usage and exits.
+  --version                          Shows version number and exits.
+Examples:
+  agreed-typed gen-swagger --path ./agreed.ts
 ```
 
-```$xslt
-$ agreed-server --path ./agreed.ts --port 3010
-```
-
-```
-$ curl http://localhost:3010/user/yosuke?q=foo
+### gen-swagger
+```shell
+$ agreed-typed gen-swagger --help
+Usage: agreed-typed gen-swagger [options]
+Options:
+  --path                             Agreed file path (required)
+  --title                            swagger title
+  --description                      swagger description
+  --version                          document version
+Examples:
+  agreed-typed gen-swagger --path ./agreed.ts
 ```
