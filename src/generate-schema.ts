@@ -1,11 +1,11 @@
 import { resolve } from "path";
 import * as ts from "typescript";
-import { default as TJS, Definition } from "typescript-json-schema";
+import * as TJS from "typescript-json-schema";
 
 export interface Spec {
   name: string;
   path: string[];
-  schema: Definition;
+  schema: TJS.Definition;
 }
 
 export function generateSchema(fileNames, typeNames, baseDir?: string): Spec[] {

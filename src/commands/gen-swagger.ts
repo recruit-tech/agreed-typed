@@ -23,7 +23,7 @@ Examples:
 
 export function generate(arg) {
   const argv = minimist(arg, {
-    string: ["path"]
+    string: ["path", "title", "description", "version"]
   });
 
   if (!argv.path) {
@@ -67,7 +67,12 @@ export function generate(arg) {
     return prev;
   }, []);
 
-  const swagger = generateSwagger(specs);
+  const swagger = generateSwagger(
+    specs,
+    argv.title,
+    argv.description,
+    argv.version
+  );
 
   process.stdout.write(JSON.stringify(swagger, null, 4));
 }

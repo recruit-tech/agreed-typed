@@ -11,6 +11,9 @@
     "gen-swagger": "ts-node src/generator.ts",
     "tsc": "tsc"
   },
+  "bin": {
+    "agreed-typed": "lib/bin/agreed-typed.js"
+  },
   "devDependencies": {
     "@types/jest": "^23.3.5",
     "@types/power-assert": "^1.5.0",
