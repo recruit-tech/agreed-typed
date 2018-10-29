@@ -84,7 +84,7 @@ function parseResponse(resp: any): object {
   const responses = resp.anyOf ? resp.anyOf.map(a => a.allOf) : [resp.allOf];
   return responses.reduce((p, c) => {
     const headers = c.find(r => r.properties.headers);
-    const statusCode = c.find(r => r.properties.statusCode);
+    const statusCode = c.find(r => r.properties.status);
     const body = c.find(r => r.properties.body);
 
     const headerProps = headers ? headers.properties.headers.properties : {};
@@ -99,7 +99,7 @@ function parseResponse(resp: any): object {
     }, {});
     return {
       ...p,
-      [`${statusCode.properties.statusCode.enum[0]}`]: {
+      [`${statusCode.properties.status.enum[0]}`]: {
         description: "test",
         headers: h, // headers ? parseProperties(headers, "header") : {},
         schema: body.properties.body
