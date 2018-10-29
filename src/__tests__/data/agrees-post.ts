@@ -33,7 +33,7 @@ const createAPIs: CreateAPI[] = [
       }
     },
     response: {
-      statusCode: 201,
+      status: 201,
       body: { message: "test" }
     }
   }

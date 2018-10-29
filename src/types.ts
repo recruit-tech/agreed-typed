@@ -38,7 +38,7 @@ export type RequestDef<
 };
 
 export type Status<C extends number, T extends string> = {
-  statusCode: C;
+  status: C;
   statusText?: T;
 };
 

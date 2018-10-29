@@ -39,7 +39,7 @@ const pingAPIs: PingAPI[] = [
     },
     response: {
       headers: { "x-token": "xxx" },
-      statusCode: 200,
+      status: 200,
       body: { message: "test" }
     }
   },
@@ -51,7 +51,7 @@ const pingAPIs: PingAPI[] = [
     },
     response: {
       headers: { "x-token": "xxx" },
-      statusCode: 200,
+      status: 200,
       body: { message: "ok {:message}" }
     }
   },
@@ -62,7 +62,7 @@ const pingAPIs: PingAPI[] = [
       body: undefined
     },
     response: {
-      statusCode: 404,
+      status: 404,
       body: { errorCode: "404", message: "invalid id" }
     }
   }

@@ -35,7 +35,7 @@ const hellos: HelloAPI[] = [
       body: undefined
     },
     response: {
-      statusCode: 200,
+      status: 200,
       body: {
         message: "{:id} {:someQueryString}"
       }
@@ -51,7 +51,7 @@ const hellos: HelloAPI[] = [
       body: undefined
     },
     response: {
-      statusCode: 404,
+      status: 404,
       body: {
         error: "test"
       }
