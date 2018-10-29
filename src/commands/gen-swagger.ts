@@ -17,19 +17,22 @@ Options:
   --title                            swagger title
   --description                      swagger description
   --version                          document version
+  --depth                            aggregate depth (default = 2)
 Examples:
   agreed-typed gen-swagger --path ./agreed.ts
 `.trim();
 
 export function generate(arg) {
   const argv = minimist(arg, {
-    string: ["path", "title", "description", "version"]
+    string: ["path", "title", "description", "version", "depth"]
   });
 
   if (!argv.path) {
     showHelp(1, usage);
     return;
   }
+
+  const depth = argv.depth ? Number(argv.depth) : 2;
 
   const agreedPath = path.resolve(process.cwd(), argv.path);
   require(agreedPath);
@@ -42,7 +45,7 @@ export function generate(arg) {
     m => m.filename === agreedPath
   );
 
-  const mods = aggregateModules(agreedRoot, 2);
+  const mods = aggregateModules(agreedRoot, depth);
 
   const filenames = mods.map(a => {
     return a.filename;
