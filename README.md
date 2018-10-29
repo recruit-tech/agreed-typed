@@ -25,13 +25,17 @@ Examples:
 ```shell
 $ agreed-typed gen-swagger --help
 Usage: agreed-typed gen-swagger [options]
-Options:
-  --path                             Agreed file path (required)
-  --title                            swagger title
-  --description                      swagger description
-  --version                          document version
-Examples:
-  agreed-typed gen-swagger --path ./agreed.ts
+  Options:
+    --path                             Agreed file path (required)
+    --title                            swagger title
+    --description                      swagger description
+    --version                          document version
+    --depth                            aggregate depth (default = 2)
+    --dry-run                          dry-run mode (outputs on stdout)
+    --output                           output filename (default schema.json)
+    --help                             show help
+  Examples:
+    agreed-typed gen-swagger --path ./agreed.ts --output schema.json
 ```
 
 ## License

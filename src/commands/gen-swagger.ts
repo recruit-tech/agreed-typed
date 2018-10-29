@@ -18,14 +18,23 @@ Options:
   --description                      swagger description
   --version                          document version
   --depth                            aggregate depth (default = 2)
+  --dry-run                          dry-run mode (outputs on stdout)
+  --output                           output filename (default schema.json)
+  --help                             show help
 Examples:
-  agreed-typed gen-swagger --path ./agreed.ts
+  agreed-typed gen-swagger --path ./agreed.ts --output schema.json
 `.trim();
 
 export function generate(arg) {
   const argv = minimist(arg, {
-    string: ["path", "title", "description", "version", "depth"]
+    string: ["path", "title", "description", "version", "depth", "output"],
+    boolean: ["dry-run"]
   });
+
+  if (argv.help) {
+    showHelp(0, usage);
+    return;
+  }
 
   if (!argv.path) {
     showHelp(1, usage);
@@ -77,7 +86,15 @@ export function generate(arg) {
     argv.version
   );
 
-  process.stdout.write(JSON.stringify(swagger, null, 4));
+  if (argv["dry-run"]) {
+    process.stdout.write(JSON.stringify(swagger, null, 4));
+    return;
+  }
+
+  fs.writeFileSync(
+    path.resolve(process.cwd(), argv.output || "schema.json"),
+    JSON.stringify(swagger, null, 4)
+  );
 }
 
 export interface ReducedSpec {
