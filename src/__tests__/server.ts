@@ -13,12 +13,11 @@ const setupServer = agreed => {
   app.use(cors());
   app.use(
     agreed.middleware({
-      path: path.resolve(__dirname, "./data/agrees-get.ts")
+      path: path.resolve(__dirname, "./data/agreed.ts")
     })
   );
   app.use((err, _, res) => {
     // tslint:disable-next-line
-    console.error(err);
     res.statusCode = 500;
     res.send(`Error is occurred : ${err}`);
   });
@@ -26,7 +25,7 @@ const setupServer = agreed => {
   return app;
 };
 
-test("(study) register ts agrees", async done => {
+test("register ts agrees with get", async done => {
   const port = await getPort();
   const agreed = new Agreed();
 
@@ -38,10 +37,57 @@ test("(study) register ts agrees", async done => {
       assert.strictEqual(response.status, 200);
       assert.deepStrictEqual(response.data, { message: "ok hello" });
 
-      const response2 = await axios.get(
+      serv.close(done);
+    } catch (e) {
+      serv.close();
+      done(e);
+    }
+  });
+});
+
+test("register ts agrees with get and query", async done => {
+  const port = await getPort();
+  const agreed = new Agreed();
+
+  const app = setupServer(agreed);
+
+  const serv = app.listen(port, async () => {
+    try {
+      const response = await axios.get(
         `http://localhost:${port}/ping/test?moo=moo&q=q`
       );
-      assert.deepStrictEqual(response2.data, { message: "test" });
+      assert.deepStrictEqual(response.data, { message: "test" });
+
+      serv.close(done);
+    } catch (e) {
+      serv.close();
+      done(e);
+    }
+  });
+});
+
+test("register ts agrees with post", async done => {
+  const port = await getPort();
+  const agreed = new Agreed();
+
+  const app = setupServer(agreed);
+
+  const serv = app.listen(port, async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:${port}/ping/test`,
+        {
+          email: "hoge@hoge.comaaa",
+          id: 123
+        },
+        {
+          headers: {
+            apiKey: "aaa"
+          }
+        }
+      );
+      assert.strictEqual(response.status, 201);
+      assert.deepStrictEqual(response.data, { message: "test" });
 
       serv.close(done);
     } catch (e) {

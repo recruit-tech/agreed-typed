@@ -14,8 +14,8 @@ export type PingAPI = APIDef<
   { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
   undefined, // request body
   { "x-token": "xxx" }, // response header
-  ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody>
->; // status code
+  ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody> // response
+>;
 
 type PongBody = {
   message: string;
