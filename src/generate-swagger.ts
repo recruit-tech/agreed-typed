@@ -108,10 +108,12 @@ function parseResponse(resp: any): object {
         }
       };
     }, {});
+    const description =
+      statusCode.properties.status.enum[0] > 399 ? "Failure" : "Success";
     return {
       ...p,
       [`${statusCode.properties.status.enum[0]}`]: {
-        description: "test",
+        description,
         headers: h, // headers ? parseProperties(headers, "header") : {},
         schema: body.properties.body
       }
