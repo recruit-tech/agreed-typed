@@ -1,3 +1,4 @@
+import * as doctrine from "doctrine";
 import * as minimist from "minimist";
 import * as path from "path";
 import { generateSchema } from "../generate-schema";
@@ -60,12 +61,12 @@ export function generate(arg) {
     return a.filename;
   });
 
-  const typeNames = mods.reduce((p, a) => {
+  const metaInfos = mods.reduce((p, a) => {
     p = p.concat(...a.asts.map(m => m.meta));
     return p;
   }, []);
 
-  const schemas = generateSchema(filenames, typeNames, "/");
+  const schemas = generateSchema(filenames, metaInfos, "/");
 
   const specs = schemas.reduce((prev: ReducedSpec[], current) => {
     const exist = prev.find(p => {
@@ -102,6 +103,7 @@ export interface ReducedSpec {
   schemas: Array<{
     name: string;
     path: string[];
+    doc: object;
     schema: Definition;
   }>;
 }
@@ -118,7 +120,18 @@ function aggregateModules(mod: NodeModule, lim = 2) {
       !module.filename.includes("node_modules")
     ) {
       const file = fs.readFileSync(module.filename, "utf-8");
-      const ast: Program = parse(file);
+      const ast: Program = parse(file, { comment: true });
+
+      const docs = ast.comments
+        .filter(c => {
+          return c.type === "Block";
+        })
+        .reduce((p, d) => {
+          const comment = `/*${d.value}*/`;
+          const docAST = doctrine.parse(comment, { unwrap: true });
+          p[d.loc.end.line] = { ast: docAST };
+          return p;
+        }, {});
 
       const mods = ast.body.reduce((prev, current) => {
         if (current.type !== "ExportNamedDeclaration") {
@@ -147,8 +160,13 @@ function aggregateModules(mod: NodeModule, lim = 2) {
             }
             return p.typeParameters.params[0].typeName.literal.value;
           });
+          const doc = docs[current.declaration.loc.start.line - 1];
           prev.push({
-            meta: { name: (declarations[0].id as any).name, path: pathArr },
+            meta: {
+              name: (declarations[0].id as any).name,
+              path: pathArr,
+              doc
+            },
             ast: current
           });
         }

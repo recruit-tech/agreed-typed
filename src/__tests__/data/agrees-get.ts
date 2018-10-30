@@ -7,6 +7,12 @@ import {
   Success200
 } from "../../types";
 
+/**
+ * Ping GET API
+ * description area
+ * may be acceptable `.md` syntax
+ * @summary PING Get API
+ */
 export type PingAPI = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message

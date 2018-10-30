@@ -55,7 +55,18 @@ function generatePath(specs: ReducedSpec[]) {
         parameters = parameters.concat(parseBody(body));
       }
       const responses = parseResponse(c.schema.properties.response);
-      p[method.enum[0].toLowerCase()] = { parameters, responses };
+
+      const doc: any = !c.doc
+        ? {}
+        : {
+            description: c.doc.ast.description,
+            ...c.doc.ast.tags.reduce((a, t) => {
+              a[t.title] = t.description;
+              return a;
+            }, {})
+          };
+
+      p[method.enum[0].toLowerCase()] = { parameters, responses, ...doc };
 
       return p;
     }, {});
