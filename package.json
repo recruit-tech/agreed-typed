@@ -1,6 +1,6 @@
 {
   "name": "agreed-typed",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "main": "./lib/types.js",
   "types": "./lib/types.d.ts",
   "license": "apache-2.0",
@@ -14,7 +14,8 @@
     "lint": "tslint ./src/**/*.ts",
     "fmt": "tslint --fix",
     "gen-swagger": "ts-node src/generator.ts",
-    "tsc": "tsc"
+    "tsc": "npm run clean && tsc",
+    "clean": "rimraf ./lib/*"
   },
   "bin": {
     "agreed-typed": "lib/bin/agreed-typed.js"
@@ -68,6 +69,7 @@
     "axios": "^0.18.0",
     "doctrine": "^2.1.0",
     "minimist": "^1.2.0",
+    "rimraf": "^2.6.2",
     "typescript-estree": "^3.0.0",
     "typescript-json-schema": "^0.32.0"
   }
