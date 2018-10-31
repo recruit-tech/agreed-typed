@@ -22,6 +22,13 @@ export function generateSchema(fileNames, meta, baseDir?: string): Spec[] {
     compilerOptions,
     baseDir
   );
+  program.getSourceFiles().forEach(sourceFile => {
+    ts.forEachChild(sourceFile, n => {
+      if (ts.isTypeAliasDeclaration(n)) {
+        n.
+      }
+    });
+  });
   const generator = TJS.buildGenerator(program, settings);
   return meta.map(m => {
     return {

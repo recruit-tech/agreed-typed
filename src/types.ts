@@ -9,6 +9,8 @@ export type HTTPMethods = GET | HEAD | POST | PATCH | PUT | DELETE;
 
 export type Capture<T extends string> = T | string;
 
+export type Placeholder<T> = T | string;
+
 export type Path = Array<string | Capture<string>>;
 
 export type RequestBody<Method extends HTTPMethods> = Method extends
