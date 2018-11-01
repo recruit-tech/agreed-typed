@@ -88,6 +88,12 @@ export function run({ path: pt, depth, title, description, version }) {
   }, []);
 
   const schemas = generateSchema(filenames, metaInfos);
+  const defs = schemas.filter(s => s.schema.definitions).reduce((p, c) => {
+    return {
+      ...p,
+      ...c.schema.definitions
+    };
+  }, {});
 
   const specs = schemas.reduce((prev: ReducedSpec[], current) => {
     const exist = prev.find(p => {
@@ -101,7 +107,7 @@ export function run({ path: pt, depth, title, description, version }) {
     return prev;
   }, []);
 
-  return generateSwagger(specs, title, description, version);
+  return generateSwagger(specs, title, description, version, defs);
 }
 
 export interface ReducedSpec {

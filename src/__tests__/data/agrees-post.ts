@@ -17,6 +17,12 @@ export type CreateAPI = APIDef<
   ResponseDef<Success201, CreateResponseBody>
 >;
 
+enum GenderType {
+  Male = 1,
+  Famale,
+  Other
+}
+
 type CreateRequestBody = {
   /**
    * @pattern [A-Z]+
@@ -27,6 +33,7 @@ type CreateRequestBody = {
    * @minimum 0
    */
   id: Placeholder<number>;
+  genderId: GenderType;
 };
 
 type CreateResponseBody = {
@@ -43,7 +50,8 @@ const createAPIs: CreateAPI[] = [
       method: "POST",
       body: {
         email: "hoge@hoge.com{:apiKey}",
-        id: "{:id}"
+        id: "{:id}",
+        genderId: 2
       },
       values: {
         id: 123

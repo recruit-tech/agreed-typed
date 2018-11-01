@@ -4,7 +4,8 @@ export function generateSwagger(
   specs: ReducedSpec[],
   title = "Agreed",
   description = "Generate via agreed-typed",
-  version = "0.0.1"
+  version = "0.0.1",
+  definitions
 ) {
   const swagger = {
     swagger: "2.0",
@@ -13,7 +14,8 @@ export function generateSwagger(
       description,
       version
     },
-    paths: generatePath(specs)
+    paths: generatePath(specs),
+    definitions
   };
 
   return swagger;
