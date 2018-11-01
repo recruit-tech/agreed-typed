@@ -1,4 +1,11 @@
-import { APIDef, Capture, POST, ResponseDef, Success201 } from "../../types";
+import {
+  APIDef,
+  Capture,
+  Placeholder,
+  POST,
+  ResponseDef,
+  Success201
+} from "../../types";
 
 export type CreateAPI = APIDef<
   POST, // HTTP Method
@@ -11,8 +18,15 @@ export type CreateAPI = APIDef<
 >;
 
 type CreateRequestBody = {
+  /**
+   * @pattern [A-Z]+
+   */
   email: string;
-  id: number;
+  /**
+   * @maximum 1000
+   * @minimum 0
+   */
+  id: Placeholder<number>;
 };
 
 type CreateResponseBody = {
@@ -29,6 +43,9 @@ const createAPIs: CreateAPI[] = [
       method: "POST",
       body: {
         email: "hoge@hoge.com{:apiKey}",
+        id: "{:id}"
+      },
+      values: {
         id: 123
       }
     },
