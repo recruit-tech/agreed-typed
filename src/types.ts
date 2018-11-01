@@ -134,6 +134,9 @@ export type APIDef<
 export function convert(...apis: Array<{ request }>) {
   return apis.map(a => {
     const { path } = a.request;
+    if (typeof path === "string") {
+      return a;
+    }
     a.request.path = "/" + path.join("/");
     return a;
   });

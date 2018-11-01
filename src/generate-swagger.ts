@@ -138,7 +138,7 @@ function parseProperties(query, inname): object[] {
     if (properties[k].enum) {
       return {
         in: inname,
-        required: query.required.includes(k),
+        required: query.required ? query.required.includes(k) : false,
         type: properties[k].type,
         name: k,
         enum: properties[k].enum,
@@ -147,7 +147,7 @@ function parseProperties(query, inname): object[] {
     }
     return {
       in: inname,
-      required: query.required.includes(k),
+      required: query.required ? query.required.includes(k) : false,
       type: properties[k].type,
       name: k
     };
