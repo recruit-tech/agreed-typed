@@ -44,7 +44,28 @@ export function generate(arg) {
 
   const depth = argv.depth ? Number(argv.depth) : 2;
 
-  const agreedPath = path.resolve(process.cwd(), argv.path);
+  const swagger = run({
+    path: argv.path,
+    description: argv.description,
+    version: argv.version,
+    depth,
+    title: argv.title
+  });
+
+  if (argv["dry-run"]) {
+    process.stdout.write(JSON.stringify(swagger, null, 4));
+    return;
+  }
+
+  fs.writeFileSync(
+    path.resolve(process.cwd(), argv.output || "schema.json"),
+    JSON.stringify(swagger, null, 4)
+  );
+}
+
+// testing entry point
+export function run({ path: pt, depth, title, description, version }) {
+  const agreedPath = path.resolve(process.cwd(), pt);
   require(agreedPath);
 
   const currentModule = require.main.children.find(
@@ -80,22 +101,7 @@ export function generate(arg) {
     return prev;
   }, []);
 
-  const swagger = generateSwagger(
-    specs,
-    argv.title,
-    argv.description,
-    argv.version
-  );
-
-  if (argv["dry-run"]) {
-    process.stdout.write(JSON.stringify(swagger, null, 4));
-    return;
-  }
-
-  fs.writeFileSync(
-    path.resolve(process.cwd(), argv.output || "schema.json"),
-    JSON.stringify(swagger, null, 4)
-  );
+  return generateSwagger(specs, title, description, version);
 }
 
 export interface ReducedSpec {

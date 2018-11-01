@@ -11,9 +11,10 @@ export interface Spec {
 }
 
 export function generateSchema(fileNames, meta): Spec[] {
-  const settings: TJS.PartialArgs = { required: true };
+  const settings: TJS.PartialArgs = { required: true, ignoreErrors: true };
   const compilerOptions: TJS.CompilerOptions = {
     noEmit: true,
+    noEmitOnError: false,
     emitDecoratorMetadata: true,
     experimentalDecorators: true,
     target: ts.ScriptTarget.ES5,
@@ -60,28 +61,6 @@ export function generateSchema(fileNames, meta): Spec[] {
   host.getSourceFileByPath = undefined;
 
   const program = ts.createProgram(fileNames, compilerOptions, host);
-  const typeChecker = program.getTypeChecker();
-
-  program.getSourceFiles().forEach(sourceFile => {
-    function inspect(node: ts.Node, tc: ts.TypeChecker) {
-      if (
-        node.kind === ts.SyntaxKind.ClassDeclaration ||
-        node.kind === ts.SyntaxKind.InterfaceDeclaration ||
-        node.kind === ts.SyntaxKind.EnumDeclaration ||
-        node.kind === ts.SyntaxKind.TypeAliasDeclaration
-      ) {
-        const symbol: ts.Symbol = (node as any).symbol;
-        const fullyQualifiedName = tc.getFullyQualifiedName(symbol);
-        const typeName = fullyQualifiedName.replace(/".*"\./, "");
-        if (typeName === "CreateRequestBody") {
-          tc.getTypeAtLocation(node);
-        }
-      } else {
-        ts.forEachChild(node, n => inspect(n, tc));
-      }
-    }
-    inspect(sourceFile, typeChecker);
-  });
 
   const generator = TJS.buildGenerator(program, settings);
   return meta.map(m => {

@@ -18,7 +18,14 @@ export type CreateAPI = APIDef<
 >;
 
 type CreateRequestBody = {
+  /**
+   * @pattern [A-Z]+
+   */
   email: string;
+  /**
+   * @maximum 1000
+   * @minimum 0
+   */
   id: Placeholder<number>;
 };
 
@@ -36,6 +43,9 @@ const createAPIs: CreateAPI[] = [
       method: "POST",
       body: {
         email: "hoge@hoge.com{:apiKey}",
+        id: "{:id}"
+      },
+      values: {
         id: 123
       }
     },
