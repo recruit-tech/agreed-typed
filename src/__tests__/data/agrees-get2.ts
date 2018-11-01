@@ -4,7 +4,8 @@ import {
   GET,
   Placeholder,
   ResponseDef,
-  Success200
+  Success200,
+  Success201
 } from "../../types";
 
 export type UserAPI = APIDef<
@@ -14,17 +15,29 @@ export type UserAPI = APIDef<
   { q: string },
   undefined,
   { "x-csrf-token": "csrf-token" },
-  ResponseDef<
-    Success200,
-    {
-      message: string;
-      images: Placeholder<string[]>;
-      themes: Placeholder<{
-        name: string;
-      }>;
-    }
-  >
+  | ResponseDef<
+      Success200,
+      {
+        message: string;
+        images: Placeholder<string[]>;
+        themes: Placeholder<theme>;
+      }
+    >
+  | ResponseDef<Success201, resp>
 >;
+
+type theme = {
+  name: string;
+};
+
+type resp = {
+  param?: Placeholder<{
+    name: string;
+  }>;
+  param2: Placeholder<{
+    nested: Placeholder<number>;
+  }>;
+};
 
 const api: UserAPI[] = [
   {
@@ -56,6 +69,35 @@ const api: UserAPI[] = [
         themes: {
           name: "green"
         }
+      }
+    }
+  },
+  {
+    request: {
+      path: ["user", ":id"],
+      method: "GET",
+      query: {
+        q: "{:someQueryStrings}"
+      },
+      body: undefined,
+      values: {
+        id: "yosuke",
+        someQueryStrings: "foo"
+      }
+    },
+    response: {
+      status: 201,
+      headers: {
+        "x-csrf-token": "csrf-token"
+      },
+      body: {
+        param: "{:aaa}",
+        param2: {
+          nested: 123
+        }
+      },
+      values: {
+        aaa: "test"
       }
     }
   }

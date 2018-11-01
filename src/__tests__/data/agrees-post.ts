@@ -1,4 +1,11 @@
-import { APIDef, Capture, POST, ResponseDef, Success201 } from "../../types";
+import {
+  APIDef,
+  Capture,
+  Placeholder,
+  POST,
+  ResponseDef,
+  Success201
+} from "../../types";
 
 export type CreateAPI = APIDef<
   POST, // HTTP Method
@@ -12,7 +19,7 @@ export type CreateAPI = APIDef<
 
 type CreateRequestBody = {
   email: string;
-  id: number;
+  id: Placeholder<number>;
 };
 
 type CreateResponseBody = {

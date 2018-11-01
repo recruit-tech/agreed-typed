@@ -66,7 +66,7 @@ export function generate(arg) {
     return p;
   }, []);
 
-  const schemas = generateSchema(filenames, metaInfos, "/");
+  const schemas = generateSchema(filenames, metaInfos);
 
   const specs = schemas.reduce((prev: ReducedSpec[], current) => {
     const exist = prev.find(p => {
