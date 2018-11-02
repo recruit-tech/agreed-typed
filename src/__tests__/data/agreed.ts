@@ -10,6 +10,7 @@ import {
 
 import * as getApis from "./agrees-get";
 import * as postApis from "./agrees-post";
+import * as putApis from "./agrees-put";
 
 type HelloAPI = APIDef<
   GET, // HTTP Method
@@ -59,6 +60,8 @@ const hellos: HelloAPI[] = [
   }
 ];
 
-const agrees = [hellos, getApis, postApis].map((a: any) => convert(...a));
+const agrees = [hellos, getApis, postApis, putApis].map((a: any) =>
+  convert(...a)
+);
 
 module.exports = agrees.reduce((acc, val) => acc.concat(val), []);
