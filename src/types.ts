@@ -112,7 +112,7 @@ export type ResponseDef<
   S extends Status<number, string>,
   B extends ResponseBody
 > = {
-  body?: B;
+  body?: S extends Success204 ? undefined : B;
 } & S;
 
 export type APIDef<

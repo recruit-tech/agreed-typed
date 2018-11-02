@@ -112,6 +112,15 @@ function parseResponse(resp: any): object {
     }, {});
     const description =
       statusCode.properties.status.enum[0] > 399 ? "Failure" : "Success";
+    if (body.properties.body.type === "undefined") {
+      return {
+        ...p,
+        [`${statusCode.properties.status.enum[0]}`]: {
+          description,
+          headers: h
+        }
+      };
+    }
     return {
       ...p,
       [`${statusCode.properties.status.enum[0]}`]: {
