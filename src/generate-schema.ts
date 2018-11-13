@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import { resolve } from "path";
 import * as ts from "typescript";
 import * as TJS from "typescript-json-schema";
 
@@ -22,27 +20,6 @@ export function generateSchema(fileNames, meta): Spec[] {
     allowUnusedLabels: true
   };
 
-  const res = p => resolve(p);
-
-  const sources = fileNames.map(res).reduce((p, f) => {
-    const src = fs.readFileSync(f).toString("utf-8");
-    const sourceFile = ts.createSourceFile(
-      f,
-      src,
-      ts.ScriptTarget.ES2015,
-      true,
-      ts.ScriptKind.TS
-    );
-
-    const result = ts.transform(sourceFile, [
-      transformPropertySignature,
-      transformTypeReferenceNode
-    ]);
-    p[f] = result.transformed[0];
-    result.dispose();
-    return p;
-  }, {});
-
   const host = ts.createCompilerHost(compilerOptions);
   const orgSourceFile = host.getSourceFile;
   host.getSourceFile = (
@@ -51,16 +28,18 @@ export function generateSchema(fileNames, meta): Spec[] {
     onError?: (message: string) => void,
     shouldCreateNewSourceFile?: boolean
   ): ts.SourceFile | undefined => {
-    if (sources[fileName]) {
-      console.log(ts.createPrinter().printFile(sources[fileName]));
-      return sources[fileName];
-    }
-    return orgSourceFile(
+    const src = orgSourceFile(
       fileName,
       languageVersion,
       onError,
       shouldCreateNewSourceFile
     );
+    const result = ts.transform(src, [
+      transformPropertySignature,
+      transformTypeReferenceNode
+    ]);
+    result.dispose();
+    return result.transformed[0] as ts.SourceFile;
   };
   host.getSourceFileByPath = undefined;
 
@@ -85,7 +64,7 @@ const transformPropertySignature = <T extends ts.Node>(
       return node;
     }
     const ps = node as ts.PropertySignature;
-    if (!ts.isTypeReferenceNode(ps.type)) {
+    if (!ps.type || !ts.isTypeReferenceNode(ps.type)) {
       return node;
     }
     const tr = ps.type as ts.TypeReferenceNode;
