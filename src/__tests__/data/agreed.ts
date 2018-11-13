@@ -10,6 +10,7 @@ import {
 
 import * as getApis from "./agrees-get";
 import * as postApis from "./agrees-post";
+import * as postApis2 from "./agrees-post2";
 import * as putApis from "./agrees-put";
 
 type HelloAPI = APIDef<
@@ -60,7 +61,7 @@ const hellos: HelloAPI[] = [
   }
 ];
 
-const agrees = [hellos, getApis, postApis, putApis].map((a: any) =>
+const agrees = [hellos, getApis, postApis, putApis, postApis2].map((a: any) =>
   convert(...a)
 );
 

@@ -34,7 +34,10 @@ export function generateSchema(fileNames, meta): Spec[] {
       ts.ScriptKind.TS
     );
 
-    const result = ts.transform(sourceFile, [transformer]);
+    const result = ts.transform(sourceFile, [
+      transformPropertySignature,
+      transformTypeReferenceNode
+    ]);
     p[f] = result.transformed[0];
     result.dispose();
     return p;
@@ -49,6 +52,7 @@ export function generateSchema(fileNames, meta): Spec[] {
     shouldCreateNewSourceFile?: boolean
   ): ts.SourceFile | undefined => {
     if (sources[fileName]) {
+      console.log(ts.createPrinter().printFile(sources[fileName]));
       return sources[fileName];
     }
     return orgSourceFile(
@@ -71,9 +75,10 @@ export function generateSchema(fileNames, meta): Spec[] {
   });
 }
 
-const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (
-  rootNode: T
-) => {
+// PropertyとしてPlaceholderを使う場合
+const transformPropertySignature = <T extends ts.Node>(
+  context: ts.TransformationContext
+) => (rootNode: T) => {
   function visit(node: ts.Node): ts.Node {
     node = ts.visitEachChild(node, visit, context);
     if (!ts.isPropertySignature(node)) {
@@ -88,6 +93,35 @@ const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (
       ps.type = tr.typeArguments[0];
     }
     return node;
+  }
+  return ts.visitNode(rootNode, visit);
+};
+
+// 型パラメータにPlaceholderを使う場合
+const transformTypeReferenceNode = <T extends ts.Node>(
+  context: ts.TransformationContext
+) => (rootNode: T) => {
+  function visit(node: ts.Node): ts.Node {
+    node = ts.visitEachChild(node, visit, context);
+    if (!ts.isTypeReferenceNode(node)) {
+      return node;
+    }
+    const tr = node as ts.TypeReferenceNode;
+    if (!tr.typeArguments) {
+      return tr;
+    }
+    const args = tr.typeArguments.map(ta => {
+      if (!ts.isTypeReferenceNode(ta)) {
+        return ta;
+      }
+      const tref = ta as ts.TypeReferenceNode;
+      if ((tref.typeName as any).escapedText === "Placeholder") {
+        return tref.typeArguments[0];
+      }
+      return tref;
+    }) as any;
+    tr.typeArguments = args;
+    return tr;
   }
   return ts.visitNode(rootNode, visit);
 };
