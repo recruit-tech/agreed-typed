@@ -5,6 +5,7 @@ export function generateSwagger(
   title = "Agreed",
   description = "Generate via agreed-typed",
   version = "0.0.1",
+  host = "localhost:3000",
   definitions
 ) {
   const swagger = {
@@ -14,6 +15,7 @@ export function generateSwagger(
       description,
       version
     },
+    host,
     paths: generatePath(specs),
     definitions
   };

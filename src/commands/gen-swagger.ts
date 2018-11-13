@@ -21,6 +21,7 @@ Options:
   --depth                            aggregate depth (default = 2)
   --dry-run                          dry-run mode (outputs on stdout)
   --output                           output filename (default schema.json)
+  --host                             swagger host (default localhost:3030)
   --help                             show help
 Examples:
   agreed-typed gen-swagger --path ./agreed.ts --output schema.json
@@ -28,7 +29,15 @@ Examples:
 
 export function generate(arg) {
   const argv = minimist(arg, {
-    string: ["path", "title", "description", "version", "depth", "output"],
+    string: [
+      "path",
+      "title",
+      "description",
+      "version",
+      "depth",
+      "output",
+      "host"
+    ],
     boolean: ["dry-run"]
   });
 
@@ -49,7 +58,8 @@ export function generate(arg) {
     description: argv.description,
     version: argv.version,
     depth,
-    title: argv.title
+    title: argv.title,
+    host: argv.host
   });
 
   if (argv["dry-run"]) {
@@ -64,7 +74,7 @@ export function generate(arg) {
 }
 
 // testing entry point
-export function run({ path: pt, depth, title, description, version }) {
+export function run({ path: pt, depth, title, description, version, host }) {
   const agreedPath = path.resolve(process.cwd(), pt);
   require(agreedPath);
 
@@ -107,7 +117,7 @@ export function run({ path: pt, depth, title, description, version }) {
     return prev;
   }, []);
 
-  return generateSwagger(specs, title, description, version, defs);
+  return generateSwagger(specs, title, description, version, host, defs);
 }
 
 export interface ReducedSpec {

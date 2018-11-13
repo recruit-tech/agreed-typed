@@ -9,7 +9,8 @@ test.skip("e2e testing", () => {
     depth: 2,
     title: "testing",
     description: "test description",
-    version: "test"
+    version: "test",
+    host: ""
   });
 
   expect(swagger).toMatchSnapshot();
