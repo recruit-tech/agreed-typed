@@ -16,6 +16,8 @@ export function generateSwagger(
       version
     },
     host,
+    produces: ["application/json"],
+    consumes: ["application/json"],
     paths: generatePath(specs),
     definitions
   };

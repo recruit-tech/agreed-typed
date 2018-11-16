@@ -86,18 +86,14 @@ export function run({ path: pt, depth, title, description, version, host }) {
     m => m.filename === agreedPath
   );
 
-  const mods = aggregateModules(agreedRoot, depth);
-
-  const filenames = mods.map(a => {
-    return a.filename;
-  });
+  const { mods, files } = aggregateModules(agreedRoot, depth);
 
   const metaInfos = mods.reduce((p, a) => {
     p = p.concat(...a.asts.map(m => m.meta));
     return p;
   }, []);
 
-  const schemas = generateSchema(filenames, metaInfos);
+  const schemas = generateSchema(files, metaInfos);
   const defs = schemas.filter(s => s.schema.definitions).reduce((p, c) => {
     return {
       ...p,
@@ -136,11 +132,11 @@ function aggregateModules(mod: NodeModule, lim = 2) {
     if (depth >= limit || files.includes(module.filename)) {
       return asts;
     }
-    files.push(module.filename);
     if (
       module.filename.endsWith(".ts") &&
       !module.filename.includes("node_modules")
     ) {
+      files.push(module.filename);
       const file = fs.readFileSync(module.filename, "utf-8");
       const ast: Program = parse(file, { comment: true });
 
@@ -208,7 +204,7 @@ function aggregateModules(mod: NodeModule, lim = 2) {
     return asts;
   };
 
-  return rec(mod, [], 0, lim);
+  return { mods: rec(mod, [], 0, lim), files };
 }
 
 function isSamePath(a: string[], b: string[]): boolean {
