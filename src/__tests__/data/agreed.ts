@@ -9,6 +9,7 @@ import {
 } from "../../types";
 
 import * as getApis from "./agrees-get";
+import * as patchApis from "./agrees-patch";
 import * as postApis from "./agrees-post";
 import * as postApis2 from "./agrees-post2";
 import * as putApis from "./agrees-put";
@@ -61,8 +62,8 @@ const hellos: HelloAPI[] = [
   }
 ];
 
-const agrees = [hellos, getApis, postApis, putApis, postApis2].map((a: any) =>
-  convert(...a)
+const agrees = [hellos, getApis, postApis, putApis, postApis2, patchApis].map(
+  (a: any) => convert(...a)
 );
 
 module.exports = agrees.reduce((acc, val) => acc.concat(val), []);

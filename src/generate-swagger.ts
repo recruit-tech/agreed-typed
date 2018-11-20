@@ -57,7 +57,7 @@ function generatePath(specs: ReducedSpec[]) {
         ...parseProperties(headers, "header")
       ];
 
-      if (body && body.properties) {
+      if (body && (body.properties || body.$ref)) {
         parameters = parameters.concat(parseBody(body));
       }
       const responses = parseResponse(c.schema.properties.response);

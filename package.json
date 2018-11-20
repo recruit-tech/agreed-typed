@@ -1,6 +1,6 @@
 {
   "name": "agreed-typed",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "main": "./lib/types.js",
   "types": "./lib/types.d.ts",
   "license": "apache-2.0",

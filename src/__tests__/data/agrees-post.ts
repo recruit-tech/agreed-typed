@@ -23,7 +23,7 @@ enum GenderType {
   Other
 }
 
-type CreateRequestBody = {
+export type CreateRequestBody = {
   /**
    * @pattern [A-Z]+
    */
