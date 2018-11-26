@@ -10,6 +10,7 @@ import * as fs from "fs";
 import { parse } from "typescript-estree";
 import { Definition } from "typescript-json-schema";
 import { TSTypeReference } from "../expression-types";
+import * as YAML from "json2yaml";
 
 const usage = `
 Usage: agreed-typed gen-swagger [options]
@@ -22,6 +23,7 @@ Options:
   --dry-run                          dry-run mode (outputs on stdout)
   --output                           output filename (default schema.json)
   --host                             swagger host (default localhost:3030)
+  --format                           file format (default json) 
   --help                             show help
 Examples:
   agreed-typed gen-swagger --path ./agreed.ts --output schema.json
@@ -36,7 +38,8 @@ export function generate(arg) {
       "version",
       "depth",
       "output",
-      "host"
+      "host",
+      "format"
     ],
     boolean: ["dry-run"]
   });
@@ -62,14 +65,18 @@ export function generate(arg) {
     host: argv.host
   });
 
-  if (argv["dry-run"]) {
-    process.stdout.write(JSON.stringify(swagger, null, 4));
-    return;
-  }
+  write(swagger, { dryRun: argv["dry-run"], format: argv.format, filename: argv.output })
+}
 
+function write(obj, { dryRun, format, filename } = { dryRun: true, format: "json", filename: "schema" }) {
+  const output = format === "json" ? JSON.stringify(obj, null, 7) : YAML.stringify(obj);
+  if (dryRun) {
+    process.stdout.write(output);
+    return
+  }
   fs.writeFileSync(
-    path.resolve(process.cwd(), argv.output || "schema.json"),
-    JSON.stringify(swagger, null, 4)
+    path.resolve(process.cwd(), `${filename}.${format}`),
+    output,
   );
 }
 
