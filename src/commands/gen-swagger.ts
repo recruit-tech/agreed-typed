@@ -75,7 +75,7 @@ function write(obj, { dryRun, format, filename } = { dryRun: true, format: "json
     return
   }
   fs.writeFileSync(
-    path.resolve(process.cwd(), `${filename || "schema"}.${format}`),
+    path.resolve(process.cwd(), `${filename || "schema"}.${format || "json"}`),
     output,
   );
 }
