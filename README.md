@@ -33,10 +33,12 @@ Usage: agreed-typed gen-swagger [options]
     --depth                            aggregate depth (default = 2)
     --dry-run                          dry-run mode (outputs on stdout)
     --output                           output filename (default schema.json)
+    --host                             swagger host (default localhost:3030)
+    --format                           file format [json|yaml] (default json)
     --help                             show help
   Examples:
-    agreed-typed gen-swagger --path ./agreed.ts --output schema.json
-```
+    agreed-typed gen-swagger --path ./agreed.ts --output schema # output file = schema.json
+    agreed-typed gen-swagger --path ./agreed.ts --output schema --format yaml #  output file = schema.yaml
 
 ## License
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
