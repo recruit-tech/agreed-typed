@@ -18,14 +18,14 @@ export function generateSwagger(
     host,
     produces: ["application/json"],
     consumes: ["application/json"],
-    paths: generatePath(specs),
+    paths: generatePath(specs, definitions),
     definitions
   };
 
   return swagger;
 }
 
-function generatePath(specs: ReducedSpec[]) {
+function generatePath(specs: ReducedSpec[], definitions: any) {
   const genpath = (schema: ReducedSpec) => {
     const pathParam = schema.path.reduce(
       (p, c) => {
@@ -53,8 +53,8 @@ function generatePath(specs: ReducedSpec[]) {
       }
       let parameters = [
         ...parsePathParam(pathParam.params),
-        ...parseProperties(query, "query"),
-        ...parseProperties(headers, "header")
+        ...parseProperties(query, "query", definitions),
+        ...parseProperties(headers, "header", definitions)
       ];
 
       if (body && (body.properties || body.$ref)) {
@@ -147,9 +147,18 @@ function parsePathParam(paths: string[]): object[] {
   });
 }
 
-function parseProperties(query, inname): object[] {
+function parseProperties(query, inname, definitions): object[] {
   const { properties } = query;
   return Object.keys(properties).map(k => {
+    if (properties[k].$ref) {
+      const defName = `${properties[k].$ref}`.split("/").slice(-1)[0];
+      const def = definitions[defName];
+      return {
+        in: inname,
+        name: k,
+        ...def
+      };
+    }
     if (properties[k].enum) {
       return {
         in: inname,

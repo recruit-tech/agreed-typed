@@ -7,6 +7,13 @@ import {
   Success200
 } from "../../types";
 
+enum QueryEnum {
+  A = 1,
+  B
+}
+
+type Moo = "moo" | "mooo";
+
 /**
  * Ping GET API
  * description area
@@ -17,7 +24,7 @@ export type PingAPI = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
   { apiKey: "x-api-key"; foo?: string }, // request header
-  { q: string; qoo?: string; moo: "moo" | "mooo" }, // request query
+  { q: string; qoo?: string; moo: Moo; query2: QueryEnum }, // request query
   undefined, // request body
   { "x-token": "xxx" }, // response header
   ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody> // response
@@ -38,7 +45,8 @@ const pingAPIs: PingAPI[] = [
       path: ["ping", "test"], // /ping/test/hoge
       query: {
         q: "{:query}",
-        moo: "moo"
+        moo: "moo",
+        query2: 1
       },
       method: "GET",
       body: undefined
