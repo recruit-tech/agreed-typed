@@ -36,7 +36,8 @@ export function generateSchema(fileNames, meta): Spec[] {
     );
     const result = ts.transform(src, [
       transformPropertySignature,
-      transformTypeReferenceNode
+      transformTypeReferenceNode,
+      transformCaptureTypeArguments
     ]);
     result.dispose();
     return result.transformed[0] as ts.SourceFile;
@@ -101,6 +102,34 @@ const transformTypeReferenceNode = <T extends ts.Node>(
     }) as any;
     tr.typeArguments = args;
     return tr;
+  }
+  return ts.visitNode(rootNode, visit);
+};
+
+const transformCaptureTypeArguments = <T extends ts.Node>(
+  context: ts.TransformationContext
+) => (rootNode: T) => {
+  function visit(node: ts.Node): ts.Node {
+    node = ts.visitEachChild(node, visit, context);
+    if (!ts.isTupleTypeNode(node)) {
+      return node;
+    }
+    const tp = node as ts.TupleTypeNode;
+    const et: ts.NodeArray<ts.TypeNode> = tp.elementTypes.map(e => {
+      if (!ts.isTypeReferenceNode(e)) {
+        return e;
+      }
+      if (
+        (e.typeName as ts.Identifier).escapedText === "Capture" &&
+        e.typeArguments.length === 2
+      ) {
+        return e.typeArguments[1];
+      }
+
+      return e;
+    }) as any;
+    tp.elementTypes = et;
+    return tp;
   }
   return ts.visitNode(rootNode, visit);
 };

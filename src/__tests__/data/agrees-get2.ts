@@ -43,7 +43,7 @@ type resp = {
 const api: UserAPI[] = [
   {
     request: {
-      path: ["user", ":id"],
+      path: ["user", 123],
       method: "GET",
       query: {
         q: "{:someQueryStrings}"

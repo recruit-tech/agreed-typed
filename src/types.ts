@@ -7,11 +7,13 @@ export type DELETE = "DELETE";
 
 export type HTTPMethods = GET | HEAD | POST | PATCH | PUT | DELETE;
 
-export type Capture<T extends string> = T | string;
+export type Capture<T extends string, P = string> = P extends string
+  ? (T | string)
+  : (P | string);
 
 export type Placeholder<T> = T | string;
 
-export type Path = Array<string | Capture<string>>;
+export type Path = Array<string | Capture<string, any>>;
 
 export type RequestBody<Method extends HTTPMethods> = Method extends
   | POST
@@ -141,3 +143,22 @@ export function convert(...apis: Array<{ request }>) {
     return a;
   });
 }
+
+/**
+ * @TJS-type integer
+ */
+export type Integer = number;
+
+/**
+ * @TJS-type integer
+ * @minimum 0
+ * @maximum 4294967295
+ */
+export type UInt32 = number;
+
+/**
+ * @TJS-type integer
+ * @minimum 0
+ * @maximum 18446744073709551615
+ */
+export type UInt64 = number;

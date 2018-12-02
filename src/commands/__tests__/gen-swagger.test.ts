@@ -10,7 +10,8 @@ test.skip("e2e testing", () => {
     title: "testing",
     description: "test description",
     version: "test",
-    host: ""
+    host: "",
+    disablePathNumber: false
   });
 
   expect(swagger).toMatchSnapshot();

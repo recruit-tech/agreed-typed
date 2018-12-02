@@ -6,7 +6,8 @@ export function generateSwagger(
   description = "Generate via agreed-typed",
   version = "0.0.1",
   host = "localhost:3000",
-  definitions
+  definitions,
+  disablePathNumber
 ) {
   const swagger = {
     swagger: "2.0",
@@ -18,21 +19,25 @@ export function generateSwagger(
     host,
     produces: ["application/json"],
     consumes: ["application/json"],
-    paths: generatePath(specs, definitions),
+    paths: generatePath(specs, definitions, disablePathNumber),
     definitions
   };
 
   return swagger;
 }
 
-function generatePath(specs: ReducedSpec[], definitions: any) {
+function generatePath(
+  specs: ReducedSpec[],
+  definitions: any,
+  disablePathNumber: boolean
+) {
   const genpath = (schema: ReducedSpec) => {
     const pathParam = schema.path.reduce(
-      (p, c) => {
+      (p, c, i) => {
         if (c.startsWith(":")) {
           const placeholder = c.slice(1);
           p.name += `/{${placeholder}}`;
-          p.params.push(placeholder);
+          p.params.push({ param: placeholder, idx: i });
           return p;
         }
         p.name += "/" + c;
@@ -46,13 +51,14 @@ function generatePath(specs: ReducedSpec[], definitions: any) {
         query,
         method,
         headers,
-        body
+        body,
+        path
       } = c.schema.properties.request.properties;
       if (p[method.enum[0]]) {
         throw new Error("generator duplicated specs");
       }
       let parameters = [
-        ...parsePathParam(pathParam.params),
+        ...parsePathParam(pathParam.params, path, disablePathNumber),
         ...parseProperties(query, "query", definitions),
         ...parseProperties(headers, "header", definitions)
       ];
@@ -136,13 +142,22 @@ function parseResponse(resp: any): object {
   }, {});
 }
 
-function parsePathParam(paths: string[]): object[] {
+function parsePathParam(
+  paths: Array<{ param: string; idx: number }>,
+  path: any,
+  disablePathNumber: boolean
+): object[] {
   return paths.map(p => {
+    const param = path.items[p.idx];
+    // workaround
+    if (disablePathNumber && param.type === "number") {
+      param.type = "integer";
+    }
     return {
       in: "path",
-      name: p,
+      name: p.param,
       required: true,
-      type: "string"
+      ...param
     };
   });
 }
