@@ -39,6 +39,7 @@ Usage: agreed-typed gen-swagger [options]
   Examples:
     agreed-typed gen-swagger --path ./agreed.ts --output schema # output file = schema.json
     agreed-typed gen-swagger --path ./agreed.ts --output schema --format yaml #  output file = schema.yaml
+```
 
 ## License
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
