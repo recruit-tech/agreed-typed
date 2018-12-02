@@ -2,6 +2,7 @@ import {
   APIDef,
   Capture,
   GET,
+  Integer,
   Placeholder,
   ResponseDef,
   Success200,
@@ -10,9 +11,9 @@ import {
 
 export type UserAPI = APIDef<
   GET,
-  ["user", Capture<":id">],
-  any,
-  { q: string },
+  ["user", Capture<":id", Integer>],
+  {},
+  { q: string; q2?: Integer },
   undefined,
   { "x-csrf-token": "csrf-token" },
   | ResponseDef<
