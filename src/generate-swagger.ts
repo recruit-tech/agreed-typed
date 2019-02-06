@@ -71,12 +71,12 @@ function generatePath(
       const doc: any = !c.doc
         ? {}
         : {
-          description: c.doc.ast.description,
-          ...c.doc.ast.tags.reduce((a, t) => {
-            a[t.title] = t.description;
-            return a;
-          }, {})
-        };
+            description: c.doc.ast.description,
+            ...c.doc.ast.tags.reduce((a, t) => {
+              a[t.title] = t.description;
+              return a;
+            }, {})
+          };
 
       p[method.enum[0].toLowerCase()] = { parameters, responses, ...doc };
 
@@ -190,6 +190,7 @@ function parseProperties(query, inname, definitions): object[] {
       type: properties[k].type,
       name: k,
       format: properties[k].format,
+      ...properties[k]
     };
   });
 }

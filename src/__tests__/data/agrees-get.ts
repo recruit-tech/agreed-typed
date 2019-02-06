@@ -3,6 +3,7 @@ import {
   Capture,
   Error404,
   GET,
+  Integer,
   ResponseDef,
   Success200
 } from "../../types";
@@ -24,7 +25,13 @@ export type PingAPI = APIDef<
   GET, // HTTP Method
   ["ping", Capture<":message">], // /ping/:message
   { apiKey: "x-api-key"; foo?: string }, // request header
-  { q: string; qoo?: string; moo: Moo; query2: QueryEnum }, // request query
+  {
+    q: string;
+    qoo?: string;
+    moo: Moo;
+    query2: QueryEnum;
+    arrayQuery?: Integer[];
+  }, // request query
   undefined, // request body
   { "x-token": "xxx" }, // response header
   ResponseDef<Success200, PongBody> | ResponseDef<Error404, ErrorPongBody> // response
