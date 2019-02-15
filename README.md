@@ -1,5 +1,7 @@
 # agreed-typed
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/akito0107/agreed-typed.svg)](https://greenkeeper.io/)
+
 - agreed api type definitions (types.ts)
 - agreed.ts to swagger generator
 
