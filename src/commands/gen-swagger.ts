@@ -5,12 +5,15 @@ import { generateSchema } from "../generate-schema";
 import { generateSwagger } from "../generate-swagger";
 import { showHelp } from "../util";
 
-import { Program } from "estree";
+import { AST_NODE_TYPES, parse } from "@typescript-eslint/typescript-estree";
+import {
+  TSTypeAliasDeclaration,
+  TSTypeReference
+} from "@typescript-eslint/typescript-estree/dist/typedefs";
+import { ExportNamedDeclaration, Identifier } from "estree";
 import * as fs from "fs";
 import * as YAML from "json2yaml";
-import { parse } from "typescript-estree";
 import { Definition } from "typescript-json-schema";
-import { TSTypeReference } from "../expression-types";
 
 const usage = `
 Usage: agreed-typed gen-swagger [options]
@@ -181,7 +184,7 @@ function aggregateModules(mod: NodeModule, lim = 2) {
     ) {
       files.push(module.filename);
       const file = fs.readFileSync(module.filename, "utf-8");
-      const ast: Program = parse(file, { comment: true });
+      const ast = parse(file, { comment: true });
 
       const docs = ast.comments
         .filter(c => {
@@ -195,36 +198,41 @@ function aggregateModules(mod: NodeModule, lim = 2) {
         }, {});
 
       const mods = ast.body.reduce((prev, current) => {
-        if (current.type !== "ExportNamedDeclaration") {
+        if (current.type !== AST_NODE_TYPES.ExportNamedDeclaration) {
           return prev;
         }
-        if (current.declaration.type !== "VariableDeclaration") {
-          return prev;
-        }
-
-        const declarations = current.declaration.declarations;
-        if (!declarations || !declarations[0]) {
-          return prev;
-        }
+        const c: ExportNamedDeclaration = current as any;
 
         if (
-          declarations[0].init &&
-          (declarations[0].init.type as string) === "TSTypeReference" &&
-          (declarations[0].init as any).typeName.name === "APIDef"
+          (c.declaration.type as any) !== AST_NODE_TYPES.TSTypeAliasDeclaration
         ) {
-          const init: TSTypeReference = declarations[0].init as any;
-          const pathType = init.typeParameters.params[1].typeName.elementTypes;
+          return prev;
+        }
 
-          const pathArr = pathType.map(p => {
+        const declaration = (c.declaration as any) as TSTypeAliasDeclaration;
+
+        if (
+          declaration.typeAnnotation.type !== AST_NODE_TYPES.TSTypeReference
+        ) {
+          return prev;
+        }
+
+        const annotation: TSTypeReference = declaration.typeAnnotation;
+
+        if ((annotation.typeName as Identifier).name === "APIDef") {
+          const params: any = annotation.typeParameters;
+
+          const pathArr = params.params[1].elementTypes.map(p => {
             if (p.literal) {
               return p.literal.value; // string
             }
-            return p.typeParameters.params[0].typeName.literal.value;
+            return p.typeParameters.params[0].literal.value;
           });
-          const doc = docs[current.declaration.loc.start.line - 1];
+
+          const doc = docs[c.declaration.loc.start.line - 1];
           prev.push({
             meta: {
-              name: (declarations[0].id as any).name,
+              name: declaration.id.name,
               path: pathArr,
               doc
             },
