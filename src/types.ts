@@ -162,3 +162,46 @@ export type UInt32 = number;
  * @maximum 18446744073709551615
  */
 export type UInt64 = number;
+
+/**
+ * internal API, only for go-swagger
+ * @param obj
+ */
+export function replace(obj) {
+  if (typeof obj !== "object") {
+    return obj;
+  }
+  if (obj == null) {
+    return true;
+  }
+  if (obj.properties) {
+    const required = obj.required || [];
+    const properties = obj.properties || {};
+
+    obj.properties = Object.keys(properties).reduce(
+      (p, prop) => {
+        const currentProp = required.includes(prop)
+          ? {
+              ...p[prop]
+            }
+          : {
+              ...p[prop],
+              "x-nullable": true
+            };
+
+        return {
+          ...p,
+          [prop]: currentProp
+        };
+      },
+      { ...properties }
+    );
+  }
+
+  return Array.isArray(obj)
+    ? obj.map(replace)
+    : Object.keys(obj).reduce((p, c) => {
+        p[c] = replace(obj[c]);
+        return p;
+      }, {});
+}
