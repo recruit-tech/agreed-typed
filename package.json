@@ -65,8 +65,8 @@
   "dependencies": {
     "@types/estree": "0.0.39",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^11.9.4",
     "@typescript-eslint/typescript-estree": "^1.4.2",
+    "@types/node": "^11.9.5",
     "agreed-core": "^3.2.2",
     "doctrine": "^3.0.0",
     "json2yaml": "^1.1.0",
