@@ -235,7 +235,7 @@ acorn@^6.0.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
   integrity sha512-MW/FjM+IvU9CgBzjO3UIPCE2pyEwUsoFl+VGdczOPEdxfGFjuKny/gN54mOuX7Qxmb9Rg9MCn2oKiSUeW+pjrw==
 
-agreed-core@^3.2.2:
+agreed-core@^3.2.4:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/agreed-core/-/agreed-core-3.2.4.tgz#62393d869e19f155a74818c8de293d32bf0d19fe"
   integrity sha512-yEC/Y7EmrUI5uaLRAIxs/SF6WNp+imwki/3aF+j+rOTOCJRdPGxV4e2XtZ/1RB13imOAvE3HfrGD3EPOjsLABg==
