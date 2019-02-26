@@ -14,7 +14,7 @@
     "lint": "tslint ./src/**/*.ts",
     "fmt": "tslint --fix",
     "gen-swagger": "ts-node src/generator.ts",
-    "tsc": "npm run clean && tsc",
+    "tsc": "yarn clean && tsc",
     "clean": "rimraf ./lib/*"
   },
   "bin": {

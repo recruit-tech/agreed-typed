@@ -9,8 +9,8 @@ jobs:
       - restore_cache:
           key: v1-dependencies-{{ checksum "package.json"}}
       - run:
-          name: Run npm install
-          command: npm install
+          name: Run yarn install
+          command: yarn install
       - run:
           name: prepare greenkeeper-lockfile
           command: |
@@ -23,8 +23,8 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: Run lint
-          command: npm run lint
+          command: yarn lint
       - run:
           name: tsc
-          command: npm run tsc
+          command: yarn tsc
       - run: greenkeeper-lockfile-upload
