@@ -68,7 +68,6 @@
     "@typescript-eslint/typescript-estree": "^1.4.2",
     "@types/node": "^11.9.5",
     "agreed-core": "^3.2.4",
-    "axios": "^0.18.0",
     "doctrine": "^3.0.0",
     "json2yaml": "^1.1.0",
     "minimist": "^1.2.0",
