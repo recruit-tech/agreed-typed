@@ -43,5 +43,33 @@ Usage: agreed-typed gen-swagger [options]
     agreed-typed gen-swagger --path ./agreed.ts --output schema --format yaml #  output file = schema.yaml
 ```
 
+## Annotations
+### Validations
+http://json-schema.org/latest/json-schema-validation.html
+
+- multipleOf
+- maximum
+- exclusiveMaximum
+- minimum
+- exclusiveMinimum
+- maxLength
+- minLength
+- pattern
+- maxItems
+- minItems
+- uniqueItems
+- maxProperties
+- minProperties
+- additionalProperties
+- enum
+- type
+- examples
+- ignore
+- description
+- format
+- default
+- $ref
+- id
+
 ## License
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
