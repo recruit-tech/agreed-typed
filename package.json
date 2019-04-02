@@ -71,6 +71,6 @@
     "doctrine": "^3.0.0",
     "json2yaml": "^1.1.0",
     "minimist": "^1.2.0",
-    "typescript-json-schema": "^0.36.0"
+    "typescript-json-schema": "^0.37.0"
   }
 }
