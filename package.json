@@ -13,7 +13,6 @@
     "test": "jest",
     "lint": "tslint ./src/**/*.ts",
     "fmt": "tslint --fix",
-    "gen-swagger": "ts-node src/generator.ts",
     "tsc": "yarn clean && tsc",
     "clean": "rimraf ./lib/*"
   },
@@ -23,6 +22,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/power-assert": "^1.5.0",
+    "axios": "^0.19.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.4",
@@ -30,14 +30,13 @@
     "jest": "^24.1.0",
     "power-assert": "^1.6.1",
     "prettier": "^1.14.3",
+    "rimraf": "^2.6.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.3",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "rimraf": "^2.6.2",
-    "axios": "^0.19.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.5.1"
   },
   "jest": {
     "testURL": "http://localhost/",
@@ -65,12 +64,12 @@
   "dependencies": {
     "@types/estree": "0.0.39",
     "@types/minimist": "^1.2.0",
-    "@typescript-eslint/typescript-estree": "^1.4.2",
     "@types/node": "^12.0.0",
+    "@typescript-eslint/typescript-estree": "^1.9.0",
     "agreed-core": "^3.2.4",
     "doctrine": "^3.0.0",
     "json2yaml": "^1.1.0",
     "minimist": "^1.2.0",
-    "typescript-json-schema": "^0.37.0"
+    "typescript-json-schema": "^0.38.2"
   }
 }
