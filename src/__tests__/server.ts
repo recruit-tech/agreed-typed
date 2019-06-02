@@ -54,7 +54,7 @@ test("register ts agrees with get and query", async done => {
   const serv = app.listen(port, async () => {
     try {
       const response = await axios.get(
-        `http://localhost:${port}/ping/test?moo=moo&q=q`
+        `http://localhost:${port}/ping/test?moo=moo&q=q&query2=1`
       );
       assert.deepStrictEqual(response.data, { message: "test" });
 
@@ -78,7 +78,8 @@ test("register ts agrees with post", async done => {
         `http://localhost:${port}/ping/test`,
         {
           email: "hoge@hoge.comaaa",
-          id: 123
+          id: 123,
+          genderId: 2
         },
         {
           headers: {
