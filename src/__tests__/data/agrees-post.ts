@@ -26,10 +26,12 @@ enum GenderType {
 export type CreateRequestBody = {
   /**
    * @pattern [A-Z]+
+   * @examples a
    */
   email: string;
   /**
    * @maximum 1000
+   * @examples 5
    * @minimum 0
    */
   id: Placeholder<number>;

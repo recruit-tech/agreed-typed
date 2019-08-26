@@ -10,7 +10,7 @@ export function generateSwagger(
   disablePathNumber
 ) {
   const swagger = {
-    swagger: "2.0",
+    openapi: "3.0.0",
     info: {
       title,
       description,
@@ -77,7 +77,6 @@ function generatePath(
               return a;
             }, {})
           };
-
       p[method.enum[0].toLowerCase()] = { parameters, responses, ...doc };
 
       return p;
@@ -94,13 +93,40 @@ function generatePath(
   }, {});
 }
 
+const defaultExamples = {
+  string: "string",
+  number: 0,
+}
+
+function getExampleFromSchema(body: object): object | undefined {
+  const maybeProperties = body['properties']
+  if (typeof maybeProperties === 'undefined') return undefined
+  console.log(maybeProperties)
+  return Object.keys(maybeProperties).reduce((acc, cur) => maybeProperties[cur].examples ? ({
+    ...acc,
+    [cur]: maybeProperties[cur].examples
+  }) : ({
+    ...acc,
+    [cur]: defaultExamples[maybeProperties[cur].type]
+  }), {})
+}
+
 function parseBody(body: object): object {
-  return {
+  const example = getExampleFromSchema(body)
+  return example ? {
     in: "body",
     name: "request body",
     required: true,
-    schema: body
-  };
+    schema: {
+      ...body,
+      example
+    },
+  } : {
+    in: "body",
+    name: "request body",
+    required: true,
+    schema: body,
+  }
 }
 
 function parseResponse(resp: any): object {
