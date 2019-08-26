@@ -10,7 +10,7 @@ export function generateSwagger(
   disablePathNumber
 ) {
   const swagger = {
-    openapi: "3.0.0",
+    swagger: "2.0",
     info: {
       title,
       description,
