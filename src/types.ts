@@ -126,6 +126,8 @@ export type APIDef<
   RespHeader extends Headers,
   Resp extends ResponseDef<Status<number, string>, object>
 > = {
+  title?: string;
+  description?: string;
   request: RequestDef<P, ReqHeader, Q, M, ReqBody>;
   response: {
     headers?: RespHeader;
