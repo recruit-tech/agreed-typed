@@ -69,7 +69,7 @@
     "agreed-core": "^3.2.4",
     "doctrine": "^3.0.0",
     "json2yaml": "^1.1.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "typescript-json-schema": "^0.40.0"
   }
 }
